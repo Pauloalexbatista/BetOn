@@ -6,7 +6,10 @@ import Link from "next/link";
 import axios from "axios";
 import { STRATEGY_TEMPLATES, StrategyTemplate } from "@/lib/strategy-templates";
 import { AVAILABLE_METRICS, OPERATORS } from "@/lib/strategy-metrics";
+import { StrategyValidator, ValidationResult } from "@/lib/strategy-validator";
 import TemplateSelector from "@/components/strategies/TemplateSelector";
+import StrategyPreview from "@/components/strategies/StrategyPreview";
+import ValidationFeedback from "@/components/strategies/ValidationFeedback";
 
 // TypeScript Interfaces
 interface Condition {
@@ -34,6 +37,9 @@ export default function StrategyBuilder() {
     // Template State
     const [showTemplates, setShowTemplates] = useState(true);
 
+    // Validation State
+    const [validation, setValidation] = useState<ValidationResult | null>(null);
+
     // Available Options
     const [availableLeagues, setAvailableLeagues] = useState<string[]>([]);
     const [availableTeams, setAvailableTeams] = useState<{ id: number, name: string, leagues: string[] }[]>([]);
@@ -52,6 +58,17 @@ export default function StrategyBuilder() {
         }
         fetchMetadata();
     }, []);
+
+    // Validate conditions on change
+    useEffect(() => {
+        if (conditions.length > 0) {
+            const validator = new StrategyValidator();
+            const result = validator.validate(conditions);
+            setValidation(result);
+        } else {
+            setValidation(null);
+        }
+    }, [conditions]);
 
     // Selection Helpers
     const toggleLeague = (league: string) => {
@@ -350,12 +367,19 @@ export default function StrategyBuilder() {
                     )}
                 </div>
 
-                {/* 4. Logic Preview (Optional) */}
+                {/* Validation Feedback */}
+                {validation && <ValidationFeedback validation={validation} />}
+
+                {/* 4. Strategy Preview */}
                 {conditions.length > 0 && (
-                    <div className="mb-6 p-4 bg-blue-900/20 border border-blue-900/50 rounded text-sm text-blue-200">
-                        <strong>Lógica:</strong> {conditions.map(c => `[${c.entity} ${c.metric} ${c.operator} ${c.value}]`).join(" AND ")}
-                    </div>
+                    <StrategyPreview
+                        conditions={conditions}
+                        targetOutcome={targetOutcome}
+                        leagues={selectedLeagues}
+                        teams={selectedTeams}
+                    />
                 )}
+
 
                 <div className="flex gap-4">
                     <button

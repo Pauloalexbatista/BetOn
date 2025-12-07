@@ -48,6 +48,14 @@ class StrategyResponse(StrategyBase):
     class Config:
         from_attributes = True
 
+class StrategyPreview(BaseModel):
+    """Model for strategy preview request"""
+    conditions: List[ConditionCreate]
+    target_outcome: str
+    leagues: Optional[List[str]] = None
+    teams: Optional[List[str]] = None
+    limit: Optional[int] = 100
+
 # --- API Endpoints ---
 
 @router.post("/", response_model=StrategyResponse)
@@ -148,6 +156,37 @@ async def run_backtest(strategy_id: int, db: Session = Depends(get_db)):
         return results
     except Exception as e:
         print(f"ERROR run_backtest: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/preview")
+async def preview_strategy(preview_data: StrategyPreview, db: Session = Depends(get_db)):
+    """
+    Quick preview of strategy performance without saving
+    Returns estimated metrics based on recent matches
+    """
+    try:
+        from analysis.strategy_preview import StrategyPreviewEngine
+        
+        # Convert conditions to dict format
+        conditions_dict = [cond.dict() for cond in preview_data.conditions]
+        
+        # Initialize preview engine
+        engine = StrategyPreviewEngine(db)
+        
+        # Run preview
+        results = engine.run_preview(
+            conditions=conditions_dict,
+            target_outcome=preview_data.target_outcome,
+            leagues=preview_data.leagues,
+            teams=preview_data.teams,
+            limit=preview_data.limit or 100
+        )
+        
+        return results
+    except Exception as e:
+        print(f"ERROR preview_strategy: {e}")
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
