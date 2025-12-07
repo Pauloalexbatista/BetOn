@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChartBarIcon, ServerIcon, DatabaseIcon } from "@heroicons/react/24/solid";
+import { ChartBarIcon, ServerIcon, CircleStackIcon } from "@heroicons/react/24/solid";
 
 interface APIStatus {
     api_football: {
@@ -101,8 +101,8 @@ export default function SystemStatusWidget() {
                             <div className="flex justify-between items-start mb-2">
                                 <span className="text-sm font-medium text-slate-300">API-Football</span>
                                 <span className={`text-xs px-2 py-1 rounded ${apiStatus.api_football.status === "active"
-                                        ? "bg-green-900 text-green-300"
-                                        : "bg-slate-700 text-slate-400"
+                                    ? "bg-green-900 text-green-300"
+                                    : "bg-slate-700 text-slate-400"
                                     }`}>
                                     {apiStatus.api_football.configured ? apiStatus.api_football.status : "Não configurada"}
                                 </span>
@@ -121,10 +121,10 @@ export default function SystemStatusWidget() {
                                             <div className="w-full bg-slate-700 rounded-full h-2">
                                                 <div
                                                     className={`h-2 rounded-full transition-all ${apiStatus.api_football.usage.percentage > 80
-                                                            ? "bg-red-500"
-                                                            : apiStatus.api_football.usage.percentage > 50
-                                                                ? "bg-yellow-500"
-                                                                : "bg-green-500"
+                                                        ? "bg-red-500"
+                                                        : apiStatus.api_football.usage.percentage > 50
+                                                            ? "bg-yellow-500"
+                                                            : "bg-green-500"
                                                         }`}
                                                     style={{ width: `${apiStatus.api_football.usage.percentage}%` }}
                                                 />
@@ -143,8 +143,8 @@ export default function SystemStatusWidget() {
                             <div className="flex justify-between items-start mb-2">
                                 <span className="text-sm font-medium text-slate-300">The Odds API</span>
                                 <span className={`text-xs px-2 py-1 rounded ${apiStatus.the_odds_api.configured
-                                        ? "bg-blue-900 text-blue-300"
-                                        : "bg-slate-700 text-slate-400"
+                                    ? "bg-blue-900 text-blue-300"
+                                    : "bg-slate-700 text-slate-400"
                                     }`}>
                                     {apiStatus.the_odds_api.configured ? "Configurada" : "Não configurada"}
                                 </span>
@@ -162,7 +162,7 @@ export default function SystemStatusWidget() {
             {/* Database Status */}
             <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-700">
                 <div className="flex items-center gap-2 mb-3">
-                    <DatabaseIcon className="h-5 w-5 text-purple-400" />
+                    <CircleStackIcon className="h-5 w-5 text-purple-400" />
                     <h3 className="font-semibold text-white">Base de Dados</h3>
                 </div>
 

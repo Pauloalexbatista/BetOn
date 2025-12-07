@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
+import { STRATEGY_TEMPLATES, StrategyTemplate } from "@/lib/strategy-templates";
+import { AVAILABLE_METRICS, OPERATORS } from "@/lib/strategy-metrics";
+import TemplateSelector from "@/components/strategies/TemplateSelector";
 
 // TypeScript Interfaces
 interface Condition {
@@ -27,6 +30,9 @@ export default function StrategyBuilder() {
     // Scope State (New)
     const [selectedLeagues, setSelectedLeagues] = useState<string[]>([]);
     const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
+
+    // Template State
+    const [showTemplates, setShowTemplates] = useState(true);
 
     // Available Options
     const [availableLeagues, setAvailableLeagues] = useState<string[]>([]);
@@ -106,6 +112,17 @@ export default function StrategyBuilder() {
         setConditions(newConditions);
     };
 
+    const loadTemplate = (template: StrategyTemplate) => {
+        setName(template.name);
+        setDescription(template.description);
+        setTargetOutcome(template.target_outcome);
+        setConditions(template.conditions);
+        if (template.leagues) setSelectedLeagues(template.leagues);
+        if (template.teams) setSelectedTeams(template.teams);
+        setShowTemplates(false);
+        window.scrollTo({ top: 300, behavior: 'smooth' });
+    };
+
     const handleSubmit = async () => {
         if (!name) return alert("Please name your strategy");
         // Warn if no logic but allow if scope is set
@@ -139,6 +156,23 @@ export default function StrategyBuilder() {
                         ← Voltar
                     </Link>
                 </div>
+
+                {/* Template Selector */}
+                {showTemplates && (
+                    <TemplateSelector
+                        onSelectTemplate={loadTemplate}
+                        onClose={() => setShowTemplates(false)}
+                    />
+                )}
+
+                {!showTemplates && (
+                    <button
+                        onClick={() => setShowTemplates(true)}
+                        className="mb-6 text-sm text-blue-400 hover:text-blue-300 underline"
+                    >
+                        🎯 Ver Templates
+                    </button>
+                )}
 
                 {/* 1. Basic Info */}
                 <div className="bg-slate-800 p-6 rounded-lg border border-slate-700 mb-6">
@@ -253,14 +287,21 @@ export default function StrategyBuilder() {
                                 <div key={idx} className="bg-slate-900 p-4 rounded border border-slate-700 flex flex-wrap gap-2 items-center">
                                     <span className="text-slate-500 font-mono text-xs mr-2">IF</span>
 
-                                    {/* Entity */}
+                                    {/* Metric Selector with Categories */}
                                     <select
+                                        value={cond.metric}
                                         onChange={e => updateCondition(idx, 'metric', e.target.value)}
                                         className="bg-slate-800 text-white text-sm p-1 rounded"
                                     >
-                                        <option value="win_rate">Taxa de Vitória %</option>
-                                        <option value="goals_scored">Golos Marcados (Média)</option>
-                                        <option value="goals_conceded">Golos Sofridos (Média)</option>
+                                        {Object.entries(AVAILABLE_METRICS).map(([catKey, category]) => (
+                                            <optgroup key={catKey} label={`${category.icon} ${category.name}`}>
+                                                {category.metrics.map(metric => (
+                                                    <option key={metric.value} value={metric.value}>
+                                                        {metric.label}
+                                                    </option>
+                                                ))}
+                                            </optgroup>
+                                        ))}
                                     </select>
 
                                     {/* Operator */}
@@ -269,8 +310,9 @@ export default function StrategyBuilder() {
                                         onChange={e => updateCondition(idx, 'operator', e.target.value)}
                                         className="bg-slate-800 text-white text-sm p-1 rounded w-16 text-center"
                                     >
-                                        <option value=">">{">"}</option>
-                                        <option value="<">{"<"}</option>
+                                        {OPERATORS.map(op => (
+                                            <option key={op.value} value={op.value}>{op.symbol}</option>
+                                        ))}
                                     </select>
 
                                     {/* Value */}
