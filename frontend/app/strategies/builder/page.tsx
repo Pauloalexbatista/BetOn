@@ -239,8 +239,18 @@ export default function StrategyBuilder() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* League Selector */}
                         <div>
-                            <label className="block text-sm text-slate-400 mb-1">Filtrar Ligas</label>
-                            <div className="h-48 overflow-y-auto bg-slate-900 border border-slate-700 rounded p-2">
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="text-sm text-slate-400">Filtrar Ligas</label>
+                                {selectedLeagues.length > 0 && (
+                                    <button
+                                        onClick={() => setSelectedLeagues([])}
+                                        className="text-xs px-2 py-1 bg-red-600 hover:bg-red-500 rounded text-white transition-colors"
+                                    >
+                                        ✕ Limpar ({selectedLeagues.length})
+                                    </button>
+                                )}
+                            </div>
+                            <div className="h-56 overflow-y-auto bg-slate-900 border border-slate-700 rounded p-2">
                                 {availableLeagues.map(l => (
                                     <div key={l} className="flex items-center gap-2 mb-1 p-1 hover:bg-slate-800 rounded cursor-pointer" onClick={() => toggleLeague(l)}>
                                         <input
@@ -253,8 +263,8 @@ export default function StrategyBuilder() {
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-1 text-xs text-slate-500">
-                                {selectedLeagues.length} ligas selecionadas.
+                            <div className="mt-2 text-xs text-slate-400">
+                                {selectedLeagues.length} liga{selectedLeagues.length !== 1 ? 's' : ''} selecionada{selectedLeagues.length !== 1 ? 's' : ''}
                             </div>
                         </div>
 
