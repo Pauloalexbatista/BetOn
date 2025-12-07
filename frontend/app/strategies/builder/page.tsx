@@ -335,8 +335,14 @@ export default function StrategyBuilder() {
                                     {/* Value */}
                                     <input
                                         type="number"
+                                        step="0.1"
                                         value={cond.value}
-                                        onChange={e => updateCondition(idx, 'value', parseFloat(e.target.value))}
+                                        onChange={e => {
+                                            const val = parseFloat(e.target.value);
+                                            if (!isNaN(val)) {
+                                                updateCondition(idx, 'value', val);
+                                            }
+                                        }}
                                         className="bg-slate-800 text-white text-sm p-1 rounded w-20 text-center"
                                     />
 
