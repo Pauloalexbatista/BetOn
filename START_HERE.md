@@ -30,22 +30,6 @@ Abre automaticamente:
 | `backend\setup.bat` | Setup só backend |
 | `backend\start.bat` | Inicia só backend |
 | `frontend\setup.bat` | Setup só frontend |
-| `frontend\start.bat` | Inicia só frontend |
-
----
-
-## 🎯 Acesso Rápido
-
-Depois de executar `start_all.bat`:
-
-- **Frontend:** http://localhost:3000
-- **API Docs:** http://localhost:8000/docs
-- **API Health:** http://localhost:8000/health
-
----
-
-## ❓ Problemas?
-
 Ver [BATCH_FILES.md](BATCH_FILES.md) para troubleshooting.
 
 ---

@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
     title: 'BetOn - Betting Automation System',
-    description: 'Sistema de automação de apostas Betfair com análise e gestão de banca',
+    description: 'Sistema de automação de apostas desportivas com análise e gestão de banca',
 }
 
 export default function RootLayout({

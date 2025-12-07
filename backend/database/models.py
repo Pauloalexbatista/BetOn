@@ -26,11 +26,12 @@ class Match(Base):
     __tablename__ = "matches"
     
     id = Column(Integer, primary_key=True, index=True)
-    api_id = Column(Integer, unique=True, index=True)
+    api_id = Column(Integer, unique=True, index=True) # External API ID
     home_team_id = Column(Integer, ForeignKey("teams.id"))
     away_team_id = Column(Integer, ForeignKey("teams.id"))
     league = Column(String)
     season = Column(String)
+    round = Column(String, nullable=True) # Gameweek/Round
     match_date = Column(DateTime, nullable=False)
     status = Column(String)  # scheduled, live, finished, postponed
     
@@ -38,7 +39,22 @@ class Match(Base):
     home_score = Column(Integer)
     away_score = Column(Integer)
     
-    # Statistics (JSON)
+    # Detailed Statistics
+    home_shots = Column(Integer, nullable=True)     # HS
+    away_shots = Column(Integer, nullable=True)     # AS
+    home_shots_target = Column(Integer, nullable=True) # HST
+    away_shots_target = Column(Integer, nullable=True) # AST
+    home_corners = Column(Integer, nullable=True)   # HC
+    away_corners = Column(Integer, nullable=True)   # AC
+    home_fouls = Column(Integer, nullable=True)     # HF
+    away_fouls = Column(Integer, nullable=True)     # AF
+    home_yellow = Column(Integer, nullable=True)    # HY
+    away_yellow = Column(Integer, nullable=True)    # AY
+    home_red = Column(Integer, nullable=True)       # HR
+    away_red = Column(Integer, nullable=True)       # AR
+    referee = Column(String, nullable=True)
+    
+    # Statistics (JSON) - Keep for any extras
     statistics = Column(JSON)
     
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -57,7 +73,7 @@ class Odds(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     match_id = Column(Integer, ForeignKey("matches.id"))
-    bookmaker = Column(String)  # betfair, bet365, etc.
+    bookmaker = Column(String)  # e.g. pinnacle, bet365
     market = Column(String)  # 1x2, over_under, btts
     
     # Odds values (JSON for flexibility)
@@ -76,19 +92,40 @@ class Strategy(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False)
     description = Column(String)
-    strategy_type = Column(String)  # value_betting, form_based, ml_prediction
+    target_outcome = Column(String, default="home_win") # home_win, away_win, draw, over_2.5, under_2.5, btts_yes, btts_no
     
-    # Configuration (JSON)
-    config = Column(JSON)
-    
+    # Scope / Filters
+    leagues = Column(JSON, nullable=True) # List of league names e.g. ["Primeira Liga"]
+    teams = Column(JSON, nullable=True)   # List of team names e.g. ["FC Porto", "Benfica"]
+
     # Status
-    is_active = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=True)
     
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
     bets = relationship("Bet", back_populates="strategy")
+    conditions = relationship("StrategyCondition", back_populates="strategy", cascade="all, delete-orphan")
+
+
+class StrategyCondition(Base):
+    """Atomic rule for a strategy"""
+    __tablename__ = "strategy_conditions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    strategy_id = Column(Integer, ForeignKey("strategies.id"))
+    
+    # Rule Definition
+    entity = Column(String)  # "home_team", "away_team", "match"
+    context = Column(String) # "overall", "home", "away"
+    metric = Column(String)  # "win_rate", "goals_scored", "odds"
+    operator = Column(String) # ">", "<", "="
+    value = Column(Float)    # The threshold value (e.g. 1.5, 0.7)
+    last_n_games = Column(Integer, default=5) # Rolling window
+
+    # Relationships
+    strategy = relationship("Strategy", back_populates="conditions")
 
 
 class Bet(Base):
@@ -105,9 +142,9 @@ class Bet(Base):
     odds = Column(Float, nullable=False)
     stake = Column(Float, nullable=False)
     
-    # Betfair specific
-    betfair_bet_id = Column(String)
-    betfair_market_id = Column(String)
+    # External IDs
+    external_bet_id = Column(String)  # ID from the bookmaker/source
+    external_market_id = Column(String) # Market ID from the bookmaker/source
     
     # Status
     status = Column(String)  # pending, matched, won, lost, void

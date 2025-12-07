@@ -26,32 +26,6 @@ npm run dev
 
 ---
 
-## 📝 Configuração Opcional
-
-### Obter API Keys (Gratuitas)
-
-1. **API-Football** (180 calls/hora grátis)
-   - Registar em: https://www.api-football.com/
-   - Copiar API key
-   - Adicionar ao `.env`: `API_FOOTBALL_KEY=your_key`
-
-2. **TheOddsAPI** (Free tier)
-   - Registar em: https://the-odds-api.com/
-   - Copiar API key
-   - Adicionar ao `.env`: `THE_ODDS_API_KEY=your_key`
-
-3. **Betfair Delayed API** (Gratuita)
-   - Criar conta: https://www.betfair.com/
-   - Gerar key: https://docs.developer.betfair.com/visualisers/api-ng-account-operations/
-   - Adicionar ao `.env`:
-     ```
-     BETFAIR_USERNAME=your_username
-     BETFAIR_PASSWORD=your_password
-     BETFAIR_APP_KEY=your_delayed_key
-     ```
-
----
-
 ## 🎯 Próximos Passos
 
 1. ✅ Testar API endpoints em `/docs`

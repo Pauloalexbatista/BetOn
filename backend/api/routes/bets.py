@@ -6,6 +6,7 @@ from datetime import datetime
 
 from database.database import get_db
 from database.models import Bet, Match, Strategy
+from api.filters import BetFilters
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -70,16 +71,20 @@ async def get_bets(
     limit: int = 50,
     status: str | None = None,
     is_paper_trade: bool | None = None,
+    filters: BetFilters = Depends(),
     db: Session = Depends(get_db)
 ):
     """Get all bets with filters"""
-    query = db.query(Bet)
+    query = db.query(Bet).join(Match)
     
     if status:
         query = query.filter(Bet.status == status)
     if is_paper_trade is not None:
         query = query.filter(Bet.is_paper_trade == is_paper_trade)
+        
+    query = filters.apply(query)
     
+    # Order by placed_at desc
     bets = query.order_by(Bet.placed_at.desc()).offset(skip).limit(limit).all()
     return bets
 

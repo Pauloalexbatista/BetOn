@@ -1,76 +1,43 @@
 # BetOn Backend
-
-API backend para o sistema BetOn de automação de apostas.
+API backend for the BetOn sports betting analysis platform.
 
 ## Setup
-
-1. **Criar ambiente virtual**
+1. **Create Virtual Environment**
 ```bash
 python -m venv venv
 venv\Scripts\activate
 ```
 
-2. **Instalar dependências**
+2. **Install Dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-3. **Configurar environment**
+3. **Initialize Database**
 ```bash
-# Copiar .env.example para .env
-copy ..\.env.example .env
-
-# Editar .env com as tuas credenciais
+# This creates beton.db and loads initial data
+python reset_and_load.py 
 ```
 
-4. **Inicializar base de dados**
-```bash
-python scripts\init_db.py
-```
-
-5. **Executar servidor**
+4. **Run Server**
 ```bash
 uvicorn main:app --reload
 ```
+API: `http://localhost:8000` | Docs: `http://localhost:8000/docs`
 
-API disponível em: `http://localhost:8000`
-Documentação: `http://localhost:8000/docs`
-
-## Estrutura
-
+## Structure
 ```
 backend/
-├── api/                # API endpoints
-│   └── routes/        # Route modules
-├── collectors/        # Data collectors
-├── analyzers/         # Analysis engines
-├── strategies/        # Betting strategies
-├── bankroll/          # Bankroll management
-├── automation/        # Betfair automation
-├── database/          # Database models
-└── scripts/           # Utility scripts
+├── api/                # API Routes (matches, bets, analysis, system)
+├── collectors/         # Data Collectors (football-data.co.uk, API-Football)
+├── analysis/           # Engines (Standings, Backtester)
+├── database/           # Models & DB Config
+├── scripts/            # Automation (update_results.py)
+└── main.py             # App Entrypoint
 ```
 
-## API Endpoints
-
-### Matches
-- `GET /api/v1/matches/upcoming` - Próximos jogos
-- `GET /api/v1/matches/{id}` - Detalhes do jogo
-
-### Bets
-- `POST /api/v1/bets/` - Criar aposta
-- `GET /api/v1/bets/` - Listar apostas
-- `GET /api/v1/bets/stats/summary` - Estatísticas
-
-### Strategies
-- `POST /api/v1/strategies/` - Criar estratégia
-- `GET /api/v1/strategies/` - Listar estratégias
-- `PATCH /api/v1/strategies/{id}/toggle` - Ativar/desativar
-
-### Bankroll
-- `GET /api/v1/bankroll/current` - Estado atual
-- `GET /api/v1/bankroll/history` - Histórico
-
-### Analysis
-- `GET /api/v1/analysis/value-bets` - Value bets
-- `GET /api/v1/analysis/team-stats/{id}` - Estatísticas de equipa
+## features
+- **Multi-Source Data**: Hybrid of `football-data.co.uk` (Stats) and `API-Football` (Schedule).
+- **Universal Filters**: Deep filtering by League, Team, Season, Date.
+- **Dynamic Standings**: "Time-travel" capable league tables.
+- **Automation**: Daily background updates for results and fixtures.

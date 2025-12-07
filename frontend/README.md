@@ -1,44 +1,36 @@
 # BetOn Frontend
-
-Interface web para o sistema BetOn.
+Web Interface for BetOn.
 
 ## Setup
-
-1. **Instalar dependências**
+1. **Install Dependencies**
 ```bash
 npm install
 ```
 
-2. **Executar em desenvolvimento**
+2. **Run Dev Server**
 ```bash
 npm run dev
 ```
+App: `http://localhost:3000`
 
-Aplicação disponível em: `http://localhost:3000`
-
-## Estrutura
-
+## Structure
 ```
 frontend/
-├── app/                # Next.js App Router
-│   ├── dashboard/     # Dashboard principal
-│   ├── matches/       # Gestão de jogos
-│   ├── bets/          # Gestão de apostas
-│   ├── strategies/    # Configuração de estratégias
-│   └── settings/      # Configurações
-├── components/        # Componentes React
-└── lib/              # Utilitários e API client
+├── app/                
+│   ├── page.tsx        # Dashboard (Update Games Button)
+│   ├── matches/        # Matches List (Interactive Tables, Universal Filter)
+│   ├── bets/           # Betting History (Universal Filter)
+│   ├── standings/      # League Tables (Time Travel)
+│   └── strategies/     # Strategy Builder (Next Phase)
+├── components/         # Shared Components (UniversalFilter)
+└── lib/                # API Client
 ```
 
-## Páginas
+## Pages
+- `/` - **Dashboard**: Overview and System Controls (Update Button).
+- `/matches` - **Matches**: Browse historical and upcoming games with deep filters.
+- `/bets` - **Bets**: Analysis of betting history.
+- `/standings` - **Standings**: Dynamic league tables with evolution charts.
 
-- `/` - Landing page
-- `/dashboard` - Dashboard principal (em desenvolvimento)
-- `/matches` - Lista de jogos (em desenvolvimento)
-- `/bets` - Gestão de apostas (em desenvolvimento)
-- `/strategies` - Estratégias (em desenvolvimento)
-
-## Desenvolvimento
-
-O frontend comunica com o backend via proxy configurado em `next.config.js`.
-Certifica-te que o backend está a correr em `http://localhost:8000`.
+## Development
+The frontend proxies requests to backend at `http://localhost:8000`.
