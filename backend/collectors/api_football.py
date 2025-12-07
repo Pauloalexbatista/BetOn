@@ -56,6 +56,17 @@ class APIFootballClient:
             
         response = self._get("/fixtures", params=params)
         return response.get("response", [])
+    
+    def get_fixtures_range(self, league_id: int, season: int, from_date: str, to_date: str) -> List[Dict[str, Any]]:
+        """Get fixtures for a league within a date range"""
+        params = {
+            "league": league_id,
+            "season": season,
+            "from": from_date,
+            "to": to_date
+        }
+        response = self._get("/fixtures", params=params)
+        return response.get("response", [])
 
     def get_standings(self, league_id: int, season: int) -> List[Dict[str, Any]]:
         """Get standings for a league"""

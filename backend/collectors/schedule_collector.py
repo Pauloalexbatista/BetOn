@@ -33,18 +33,23 @@ class ScheduleCollector:
         self.client = APIFootballClient()
         self.db = db if db else SessionLocal()
 
-    def sync_upcoming(self, days=14):
-        """Fetch scheduled matches for the next N days"""
-        logger.info(f"Fetching upcoming matches for next {days} days...")
-        
-        from_date = datetime.now().strftime("%Y-%m-%d")
-        to_date = (datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d")
+    def sync_upcoming(self, days=None):
+        """Fetch scheduled matches for the rest of the season"""
+        if days:
+            # Original behavior: next N days
+            logger.info(f"Fetching upcoming matches for next {days} days...")
+            from_date = datetime.now().strftime("%Y-%m-%d")
+            to_date = (datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d")
+        else:
+            # New behavior: rest of season
+            logger.info("Fetching ALL remaining matches for the season...")
+            from_date = datetime.now().strftime("%Y-%m-%d")
+            to_date = "2025-06-30"  # End of 2024/25 season
         
         count_new = 0
         
-        # Current Season (2025/2026 -> 2025 in API-Football usually)
-        # Note: If date is Dec 2025, season is 2025.
-        season = 2025 
+        # Current Season: 2024/2025 -> 2024 in API-Football
+        season = 2024
         
         for league_name, league_id in self.LEAGUE_IDS.items():
             try:

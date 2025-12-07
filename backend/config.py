@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     # The Odds API
     the_odds_api_key: str = ""
     the_odds_api_base_url: str = "https://api.the-odds-api.com/v4"
+    
+    # Football-Data.org (FREE for current season!)
+    football_data_org_key: str = ""
 
     # Automation
     paper_trading_mode: bool = True
