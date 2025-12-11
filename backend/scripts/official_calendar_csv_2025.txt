@@ -1,0 +1,107 @@
+Jornada,Data,Jogo,Resultado
+1,09/08/2024,Sporting CP - Rio Ave,3-1
+1,10/08/2024,FC Porto - Gil Vicente,3-0
+1,11/08/2024,Famalicão - Benfica,2-0
+1,11/08/2024,SC Braga - Estrela da Amadora,1-1
+1,12/08/2024,Vitória SC - Arouca,1-0
+2,17/08/2024,Nacional - Sporting CP,1-6
+2,17/08/2024,Benfica - Casa Pia,3-0
+2,18/08/2024,Santa Clara - FC Porto,0-2
+2,18/08/2024,Boavista - SC Braga,0-1
+3,23/08/2024,Farense - Sporting CP,0-5
+3,24/08/2024,FC Porto - Rio Ave,2-0
+3,24/08/2024,Benfica - Estrela da Amadora,1-0
+3,25/08/2024,SC Braga - Moreirense,3-1
+4,31/08/2024,Sporting CP - FC Porto,2-0
+4,30/08/2024,Moreirense - Benfica,1-1
+4,01/09/2024,Gil Vicente - SC Braga,0-0
+5,13/09/2024,FC Porto - Farense,2-1
+5,14/09/2024,Benfica - Santa Clara,4-1
+5,15/09/2024,Arouca - Sporting CP,0-3
+5,15/09/2024,SC Braga - Vitória SC,0-2
+6,21/09/2024,Boavista - Benfica,0-3
+6,22/09/2024,Sporting CP - AVS SAD,3-0
+6,22/09/2024,Vitória SC - FC Porto,0-3
+6,23/09/2024,Nacional - SC Braga,0-3
+7,27/09/2024,Estoril - Sporting CP,0-3
+7,28/09/2024,Benfica - Gil Vicente,5-1
+7,29/09/2024,FC Porto - Arouca,4-0
+7,29/09/2024,SC Braga - Rio Ave,4-0
+8,05/10/2024,Sporting CP - Casa Pia,2-0
+8,06/10/2024,FC Porto - SC Braga,2-1
+8,06/10/2024,Nacional - Benfica,0-0
+9,26/10/2024,Famalicão - Sporting CP,0-3
+9,27/10/2024,Benfica - Rio Ave,5-0
+9,28/10/2024,AVS SAD - FC Porto,0-5
+9,28/10/2024,SC Braga - Farense,2-0
+10,01/11/2024,Sporting CP - Estrela da Amadora,5-1
+10,02/11/2024,Farense - Benfica,1-2
+10,03/11/2024,FC Porto - Estoril,4-0
+10,03/11/2024,Arouca - SC Braga,1-2
+11,10/11/2024,SC Braga - Sporting CP,2-4
+11,10/11/2024,Benfica - FC Porto,4-1
+12,30/11/2024,Sporting CP - Santa Clara,1-0
+12,01/12/2024,Arouca - Benfica,0-2
+12,02/12/2024,FC Porto - Casa Pia,2-0
+13,07/12/2024,Moreirense - Sporting CP,0-1
+13,07/12/2024,Benfica - Vitória SC,2-1
+13,08/12/2024,Famalicão - FC Porto,1-2
+14,15/12/2024,Boavista - Sporting CP,0-2
+14,15/12/2024,FC Porto - Estrela da Amadora,3-0
+14,16/12/2024,AVS SAD - Benfica,0-4
+15,21/12/2024,Sporting CP - Vitória SC,3-0
+15,22/12/2024,Benfica - Estoril,2-0
+15,23/12/2024,Moreirense - FC Porto,1-1
+16,29/12/2024,Sporting CP - Benfica,1-0
+16,29/12/2024,FC Porto - Boavista,2-0
+17,04/01/2025,Gil Vicente - Sporting CP,0-4
+17,05/01/2025,Benfica - SC Braga,3-1
+17,05/01/2025,Nacional - FC Porto,0-2
+18,18/01/2025,Rio Ave - Sporting CP,0-2
+18,19/01/2025,Benfica - Famalicão,2-0
+18,19/01/2025,Gil Vicente - FC Porto,0-1
+19,25/01/2025,Sporting CP - Nacional,4-0
+19,26/01/2025,Casa Pia - Benfica,0-1
+19,26/01/2025,FC Porto - Santa Clara,2-0
+20,02/02/2025,FC Porto - Rio Ave,3-1
+20,02/02/2025,Estrela da Amadora - Benfica,0-2
+20,03/02/2025,Sporting CP - Farense,3-0
+21,09/02/2025,FC Porto - Sporting CP,1-1
+21,09/02/2025,Benfica - Moreirense,2-0
+22,16/02/2025,Sporting CP - Arouca,2-0
+22,16/02/2025,Santa Clara - Benfica,0-3
+22,17/02/2025,Farense - FC Porto,0-2
+23,23/02/2025,AVS SAD - Sporting CP,0-4
+23,23/02/2025,Benfica - Boavista,3-0
+23,24/02/2025,FC Porto - Vitória SC,2-1
+24,02/03/2025,Sporting CP - Estoril,3-1
+24,02/03/2025,Gil Vicente - Benfica,0-2
+24,03/03/2025,Arouca - FC Porto,0-3
+25,09/03/2025,Casa Pia - Sporting CP,0-1
+25,09/03/2025,SC Braga - FC Porto,1-1
+25,10/03/2025,Benfica - Nacional,3-0
+26,16/03/2025,Sporting CP - Famalicão,2-0
+26,16/03/2025,Rio Ave - Benfica,1-2
+26,17/03/2025,FC Porto - AVS SAD,2-0
+27,30/03/2025,Estrela da Amadora - Sporting CP,0-3
+27,30/03/2025,Benfica - Farense,4-0
+27,31/03/2025,Estoril - FC Porto,1-2
+28,06/04/2025,Sporting CP - SC Braga,2-1
+28,06/04/2025,FC Porto - Benfica,1-2
+29,13/04/2025,Santa Clara - Sporting CP,0-2
+29,13/04/2025,Benfica - Arouca,2-0
+29,14/04/2025,Casa Pia - FC Porto,0-1
+30,20/04/2025,Sporting CP - Moreirense,3-0
+30,20/04/2025,Vitória SC - Benfica,0-1
+30,21/04/2025,FC Porto - Famalicão,2-0
+31,27/04/2025,Sporting CP - Boavista,4-0
+31,27/04/2025,Benfica - AVS SAD,3-0
+31,28/04/2025,Estrela da Amadora - FC Porto,0-2
+32,04/05/2025,Vitória SC - Sporting CP,1-1
+32,04/05/2025,Estoril - Benfica,0-2
+32,05/05/2025,FC Porto - Moreirense,3-1
+33,11/05/2025,Benfica - Sporting CP,2-2
+33,11/05/2025,Boavista - FC Porto,0-2
+34,18/05/2025,Sporting CP - Gil Vicente,3-0
+34,18/05/2025,SC Braga - Benfica,1-1
+34,18/05/2025,FC Porto - Nacional,4-1

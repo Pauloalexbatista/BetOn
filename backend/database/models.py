@@ -93,6 +93,7 @@ class Strategy(Base):
     name = Column(String, unique=True, nullable=False)
     description = Column(String)
     target_outcome = Column(String, default="home_win") # home_win, away_win, draw, over_2.5, under_2.5, btts_yes, btts_no
+    strategy_type = Column(String, default="single")  # "single" or "accumulator"
     
     # Scope / Filters
     leagues = Column(JSON, nullable=True) # List of league names e.g. ["Primeira Liga"]

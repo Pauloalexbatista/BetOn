@@ -49,7 +49,7 @@ export default function StrategyBuilder() {
         const fetchMetadata = async () => {
             try {
                 // Fetch Leagues & Teams
-                const res = await axios.get("http://localhost:8000/api/matches/filters/options");
+                const res = await axios.get("http://127.0.0.1:8000/api/matches/filters/options");
                 setAvailableLeagues(res.data.leagues || []);
                 setAvailableTeams(res.data.teams || []);
             } catch (err) {
@@ -98,7 +98,17 @@ export default function StrategyBuilder() {
     });
 
     // Sort Displayed
+    // TODO: Implement Top 20 sort when variables are available
+    // if (showTop20Only && top20TeamIds.length > 0) {
+    //     displayedTeams.sort((a, b) => {
+    //         const aIndex = top20TeamIds.indexOf(a.id);
+    //         const bIndex = top20TeamIds.indexOf(b.id);
+    //         return aIndex - bIndex;
+    //     });
+    // } else {
+    // Sort alphabetically
     displayedTeams.sort((a, b) => a.name.localeCompare(b.name));
+    // }
 
     // ...
 
@@ -221,6 +231,7 @@ export default function StrategyBuilder() {
                                 onChange={e => setTargetOutcome(e.target.value)}
                                 className="w-full bg-slate-900 text-white p-3 rounded border border-slate-700"
                             >
+                                <option value="win">Win (Vitória - Casa ou Fora)</option>
                                 <option value="home_win">Home Win (Vitória Casa)</option>
                                 <option value="away_win">Away Win (Vitória Fora)</option>
                                 <option value="draw">Draw (Empate)</option>
@@ -268,10 +279,58 @@ export default function StrategyBuilder() {
                             </div>
                         </div>
 
+
                         {/* Team Selector */}
                         <div>
-                            <label className="block text-sm text-slate-400 mb-1">Filtrar Equipas Específicas</label>
-                            <div className="h-48 overflow-y-auto bg-slate-900 border border-slate-700 rounded p-2">
+                            <div className="flex flex-col gap-2 mb-2">
+                                <div className="flex justify-between items-center">
+                                    <label className="text-sm text-slate-400">Filtrar Equipas Específicas</label>
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                // Map targetOutcome (e.g. 'home_win') to market param if needed, 
+                                                // or pass directly if backend handles it (backend expects 'market').
+                                                // The drop down values like 'home_win', 'over_2.5' match backend markets usually.
+                                                const res = await axios.get(`http://localhost:8000/api/strategies/recommendations?top_20_only=true&market=${targetOutcome}`);
+                                                const topTeams = res.data.recommendations.map((r: any) => r.team_name);
+
+                                                // Filter to only select those that are currently visible/available (respecting selected leagues)
+                                                const visibleTopTeams = topTeams.filter((name: string) =>
+                                                    displayedTeams.some(dt => dt.name === name)
+                                                );
+                                                setSelectedTeams(visibleTopTeams);
+                                            } catch (err) {
+                                                console.error(err);
+                                                alert("Erro ao carregar Top 20%. Verifique o backend.");
+                                            }
+                                        }}
+                                        className="text-xs px-2 py-1 bg-yellow-600 hover:bg-yellow-500 text-white rounded transition-colors flex items-center gap-1 shadow-sm"
+                                        title={`Selecionar Top 20% para o mercado "${targetOutcome}"`}
+                                    >
+                                        ⭐ Top 20%
+                                    </button>
+                                </div>
+                                <div className="flex justify-end gap-2">
+                                    <button
+                                        onClick={() => {
+                                            const allTeamNames = displayedTeams.map(t => t.name);
+                                            setSelectedTeams(allTeamNames);
+                                        }}
+                                        className="text-xs px-2 py-1 bg-green-700 hover:bg-green-600 text-white rounded transition-colors"
+                                        title="Marcar todas as equipas visíveis"
+                                    >
+                                        ✓ Todas
+                                    </button>
+                                    <button
+                                        onClick={() => setSelectedTeams([])}
+                                        className="text-xs px-2 py-1 bg-red-700 hover:bg-red-600 text-white rounded transition-colors"
+                                        title="Limpar seleção"
+                                    >
+                                        ✕ Limpar
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="h-96 overflow-y-auto bg-slate-900 border border-slate-700 rounded p-2">
                                 {displayedTeams
                                     .map(t => (
                                         <div key={t.id} className="flex items-center gap-2 mb-1 p-1 hover:bg-slate-800 rounded cursor-pointer" onClick={() => toggleTeam(t.name)}>

@@ -235,3 +235,73 @@ def get_team_pulse(
     # Sort alphabetically by default
     results.sort(key=lambda x: x['team'])
     return results
+
+@router.get("/pareto-analysis")
+def get_pareto_analysis(
+    min_matches: int = Query(default=5, ge=1),
+    season: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """
+    Get Pareto (80/20) analysis of teams
+    Returns top 20% performing teams and overall statistics
+    
+    Args:
+        min_matches: Minimum matches to consider a team
+        season: Optional season filter (e.g., '2024-25')
+    """
+    import sys
+    import os
+    
+    # Add backend directory to path to import pareto_analyzer
+    backend_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    if backend_path not in sys.path:
+        sys.path.insert(0, backend_path)
+    
+    from analysis.pareto_analyzer import ParetoAnalyzer
+    
+    analyzer = ParetoAnalyzer()
+    
+    # Get all teams analysis
+    all_teams = analyzer.analyze_teams_roi(min_matches=min_matches)
+    
+    # Get top 20%
+    top_20_teams = analyzer.get_top_20_percent_teams(min_matches=min_matches)
+    
+    # Get home vs away stats
+    home_away = analyzer.analyze_home_vs_away()
+    
+    # Get bet types analysis
+    bet_types = analyzer.analyze_bet_types_roi()
+    
+    # Get betting markets analysis
+    markets_all = analyzer.analyze_betting_markets(season=None)
+    
+    # Get available seasons
+    seasons = analyzer.get_available_seasons()
+    
+    # Get current season analysis if available
+    current_season_markets = None
+    if seasons:
+        current_season = seasons[0]  # Most recent season
+        current_season_markets = analyzer.analyze_betting_markets(season=current_season)
+    
+    return {
+        "summary": {
+            "total_teams": len(all_teams),
+            "top_20_percent_count": len(top_20_teams),
+            "total_matches": home_away['total_matches'],
+            "available_seasons": seasons,
+            "current_season": seasons[0] if seasons else None
+        },
+        "top_20_percent_teams": top_20_teams,
+        "all_teams": all_teams,
+        "home_vs_away": home_away,
+        "bet_types": bet_types,
+        "betting_markets": {
+            "all_time": markets_all,
+            "current_season": current_season_markets
+        }
+    }
+
+

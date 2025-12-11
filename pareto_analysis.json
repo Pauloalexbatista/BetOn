@@ -1,0 +1,385 @@
+{
+  "generated_at": "2025-12-08T08:59:59.786928",
+  "summary": {
+    "total_teams": 28,
+    "top_20_percent_count": 5,
+    "total_matches_analyzed": 1838
+  },
+  "top_20_percent_teams": [
+    {
+      "team_id": 3,
+      "name": "Sporting CP",
+      "total_matches": 34,
+      "wins": 29,
+      "draws": 3,
+      "losses": 2,
+      "win_rate": 85.29,
+      "points": 90,
+      "points_percentage": 88.24
+    },
+    {
+      "team_id": 1,
+      "name": "FC Porto",
+      "total_matches": 204,
+      "wins": 150,
+      "draws": 32,
+      "losses": 22,
+      "win_rate": 73.53,
+      "points": 482,
+      "points_percentage": 78.76
+    },
+    {
+      "team_id": 2,
+      "name": "SL Benfica",
+      "total_matches": 204,
+      "wins": 148,
+      "draws": 30,
+      "losses": 26,
+      "win_rate": 72.55,
+      "points": 474,
+      "points_percentage": 77.45
+    },
+    {
+      "team_id": 26,
+      "name": "Sp Lisbon",
+      "total_matches": 170,
+      "wins": 123,
+      "draws": 25,
+      "losses": 22,
+      "win_rate": 72.35,
+      "points": 394,
+      "points_percentage": 77.25
+    },
+    {
+      "team_id": 4,
+      "name": "SC Braga",
+      "total_matches": 34,
+      "wins": 21,
+      "draws": 5,
+      "losses": 8,
+      "win_rate": 61.76,
+      "points": 68,
+      "points_percentage": 66.67
+    }
+  ],
+  "all_teams": [
+    {
+      "team_id": 3,
+      "name": "Sporting CP",
+      "total_matches": 34,
+      "wins": 29,
+      "draws": 3,
+      "losses": 2,
+      "win_rate": 85.29,
+      "points": 90,
+      "points_percentage": 88.24
+    },
+    {
+      "team_id": 1,
+      "name": "FC Porto",
+      "total_matches": 204,
+      "wins": 150,
+      "draws": 32,
+      "losses": 22,
+      "win_rate": 73.53,
+      "points": 482,
+      "points_percentage": 78.76
+    },
+    {
+      "team_id": 2,
+      "name": "SL Benfica",
+      "total_matches": 204,
+      "wins": 148,
+      "draws": 30,
+      "losses": 26,
+      "win_rate": 72.55,
+      "points": 474,
+      "points_percentage": 77.45
+    },
+    {
+      "team_id": 26,
+      "name": "Sp Lisbon",
+      "total_matches": 170,
+      "wins": 123,
+      "draws": 25,
+      "losses": 22,
+      "win_rate": 72.35,
+      "points": 394,
+      "points_percentage": 77.25
+    },
+    {
+      "team_id": 4,
+      "name": "SC Braga",
+      "total_matches": 34,
+      "wins": 21,
+      "draws": 5,
+      "losses": 8,
+      "win_rate": 61.76,
+      "points": 68,
+      "points_percentage": 66.67
+    },
+    {
+      "team_id": 24,
+      "name": "Sp Braga",
+      "total_matches": 170,
+      "wins": 102,
+      "draws": 29,
+      "losses": 39,
+      "win_rate": 60.0,
+      "points": 335,
+      "points_percentage": 65.69
+    },
+    {
+      "team_id": 16,
+      "name": "Guimaraes",
+      "total_matches": 204,
+      "wins": 92,
+      "draws": 44,
+      "losses": 68,
+      "win_rate": 45.1,
+      "points": 320,
+      "points_percentage": 52.29
+    },
+    {
+      "team_id": 17,
+      "name": "Arouca",
+      "total_matches": 136,
+      "wins": 48,
+      "draws": 33,
+      "losses": 55,
+      "win_rate": 35.29,
+      "points": 177,
+      "points_percentage": 43.38
+    },
+    {
+      "team_id": 19,
+      "name": "Moreirense",
+      "total_matches": 170,
+      "wins": 59,
+      "draws": 48,
+      "losses": 63,
+      "win_rate": 34.71,
+      "points": 225,
+      "points_percentage": 44.12
+    },
+    {
+      "team_id": 6,
+      "name": "Famalicao",
+      "total_matches": 204,
+      "wins": 66,
+      "draws": 63,
+      "losses": 75,
+      "win_rate": 32.35,
+      "points": 261,
+      "points_percentage": 42.65
+    },
+    {
+      "team_id": 25,
+      "name": "Gil Vicente",
+      "total_matches": 204,
+      "wins": 63,
+      "draws": 53,
+      "losses": 88,
+      "win_rate": 30.88,
+      "points": 242,
+      "points_percentage": 39.54
+    },
+    {
+      "team_id": 10,
+      "name": "Casa Pia",
+      "total_matches": 102,
+      "wins": 31,
+      "draws": 24,
+      "losses": 47,
+      "win_rate": 30.39,
+      "points": 117,
+      "points_percentage": 38.24
+    },
+    {
+      "team_id": 30,
+      "name": "Pacos Ferreira",
+      "total_matches": 136,
+      "wins": 41,
+      "draws": 30,
+      "losses": 65,
+      "win_rate": 30.15,
+      "points": 153,
+      "points_percentage": 37.5
+    },
+    {
+      "team_id": 29,
+      "name": "Santa Clara",
+      "total_matches": 136,
+      "wins": 38,
+      "draws": 37,
+      "losses": 61,
+      "win_rate": 27.94,
+      "points": 151,
+      "points_percentage": 37.01
+    },
+    {
+      "team_id": 18,
+      "name": "Estoril",
+      "total_matches": 136,
+      "wins": 37,
+      "draws": 29,
+      "losses": 70,
+      "win_rate": 27.21,
+      "points": 140,
+      "points_percentage": 34.31
+    },
+    {
+      "team_id": 9,
+      "name": "Farense",
+      "total_matches": 102,
+      "wins": 27,
+      "draws": 24,
+      "losses": 51,
+      "win_rate": 26.47,
+      "points": 105,
+      "points_percentage": 34.31
+    },
+    {
+      "team_id": 13,
+      "name": "Rio Ave",
+      "total_matches": 170,
+      "wins": 44,
+      "draws": 71,
+      "losses": 55,
+      "win_rate": 25.88,
+      "points": 203,
+      "points_percentage": 39.8
+    },
+    {
+      "team_id": 28,
+      "name": "Maritimo",
+      "total_matches": 136,
+      "wins": 35,
+      "draws": 33,
+      "losses": 68,
+      "win_rate": 25.74,
+      "points": 138,
+      "points_percentage": 33.82
+    },
+    {
+      "team_id": 31,
+      "name": "Tondela",
+      "total_matches": 102,
+      "wins": 26,
+      "draws": 22,
+      "losses": 54,
+      "win_rate": 25.49,
+      "points": 100,
+      "points_percentage": 32.68
+    },
+    {
+      "team_id": 8,
+      "name": "Portimonense",
+      "total_matches": 206,
+      "wins": 52,
+      "draws": 48,
+      "losses": 106,
+      "win_rate": 25.24,
+      "points": 204,
+      "points_percentage": 33.01
+    },
+    {
+      "team_id": 21,
+      "name": "Boavista",
+      "total_matches": 204,
+      "wins": 51,
+      "draws": 68,
+      "losses": 85,
+      "win_rate": 25.0,
+      "points": 221,
+      "points_percentage": 36.11
+    },
+    {
+      "team_id": 32,
+      "name": "Belenenses",
+      "total_matches": 102,
+      "wins": 23,
+      "draws": 32,
+      "losses": 47,
+      "win_rate": 22.55,
+      "points": 101,
+      "points_percentage": 33.01
+    },
+    {
+      "team_id": 14,
+      "name": "Chaves",
+      "total_matches": 102,
+      "wins": 22,
+      "draws": 26,
+      "losses": 54,
+      "win_rate": 21.57,
+      "points": 92,
+      "points_percentage": 30.07
+    },
+    {
+      "team_id": 12,
+      "name": "Vizela",
+      "total_matches": 136,
+      "wins": 28,
+      "draws": 41,
+      "losses": 67,
+      "win_rate": 20.59,
+      "points": 125,
+      "points_percentage": 30.64
+    },
+    {
+      "team_id": 15,
+      "name": "Estrela",
+      "total_matches": 68,
+      "wins": 14,
+      "draws": 24,
+      "losses": 30,
+      "win_rate": 20.59,
+      "points": 66,
+      "points_percentage": 32.35
+    },
+    {
+      "team_id": 35,
+      "name": "Setubal",
+      "total_matches": 34,
+      "wins": 7,
+      "draws": 13,
+      "losses": 14,
+      "win_rate": 20.59,
+      "points": 34,
+      "points_percentage": 33.33
+    },
+    {
+      "team_id": 33,
+      "name": "Nacional",
+      "total_matches": 34,
+      "wins": 6,
+      "draws": 7,
+      "losses": 21,
+      "win_rate": 17.65,
+      "points": 25,
+      "points_percentage": 24.51
+    },
+    {
+      "team_id": 34,
+      "name": "Aves",
+      "total_matches": 34,
+      "wins": 5,
+      "draws": 2,
+      "losses": 27,
+      "win_rate": 14.71,
+      "points": 17,
+      "points_percentage": 16.67
+    }
+  ],
+  "home_vs_away": {
+    "total_matches": 1838,
+    "home_wins": 791,
+    "home_win_rate": 43.04,
+    "draws": 448,
+    "draw_rate": 24.37,
+    "away_wins": 599,
+    "away_win_rate": 32.59
+  },
+  "bet_types": []
+}

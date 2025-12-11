@@ -153,6 +153,24 @@ export default function Home() {
                         <div className="text-3xl mb-2">💰</div>
                         <h3 className="font-semibold">Banca</h3>
                     </a>
+
+                    <a
+                        href="/analysis/pareto"
+                        className="bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-lg p-6 text-center transition-all shadow-lg hover:shadow-purple-500/50"
+                    >
+                        <div className="text-3xl mb-2">📊</div>
+                        <h3 className="font-semibold">Análise Pareto</h3>
+                        <p className="text-xs mt-1 opacity-90">Top 20% Equipas</p>
+                    </a>
+
+                    <a
+                        href="/analysis/markets"
+                        className="bg-gradient-to-br from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg p-6 text-center transition-all shadow-lg hover:shadow-emerald-500/50"
+                    >
+                        <div className="text-3xl mb-2">📈</div>
+                        <h3 className="font-semibold">Mercados</h3>
+                        <p className="text-xs mt-1 opacity-90">Over/Under, BTTS, 1X2</p>
+                    </a>
                 </div>
 
                 {/* Setup Instructions */}

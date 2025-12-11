@@ -1,13 +1,38 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+
+interface Match {
+    id: number;
+    home_team: string;
+    away_team: string;
+    date: string;
+    round: string;
+}
+
+interface Bet {
+    id: number;
+    match_id: number;
+    match?: Match; // Optional match details
+    market: string;
+    selection: string;
+    odds: number;
+    stake: number;
+    status: string;
+    profit_loss?: number;
+    placed_at: string;
+}
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 export default function BankrollPage() {
     // State
     const [summary, setSummary] = useState({ current_balance: 1000, active_exposure: 0 });
-    const [bets, setBets] = useState([]);
+    const [bets, setBets] = useState<Bet[]>([]);
     const [alerts, setAlerts] = useState<string[]>([]);
     const [refresh, setRefresh] = useState(0);
+    const [stats, setStats] = useState<any>(null); // For charts
 
     // Kelly Calc State
     const [kellyOdds, setKellyOdds] = useState(2.00);
@@ -20,7 +45,7 @@ export default function BankrollPage() {
         match_id: 0,
         match_name: "",
         selection: "",
-        market: "Match Odds",
+        market: "1x2",
         odds: "2.00",
         stake: "10.00"
     });
@@ -32,19 +57,58 @@ export default function BankrollPage() {
 
     const fetchData = () => {
         // Summary
-        fetch('http://localhost:8000/api/bankroll/summary')
+        fetch('http://localhost:8000/api/bets/stats/summary') // Updated to use the new robust endpoint
             .then(res => res.json())
-            .then(data => setSummary(data));
+            .then(data => {
+                if (data.bankroll) {
+                    setSummary({
+                        current_balance: data.bankroll.current,
+                        active_exposure: data.bankroll.exposure
+                    });
+                }
+            });
 
-        // Alerts
+        // Alerts (keep original endpoint or migrate later)
         fetch('http://localhost:8000/api/bankroll/alerts')
             .then(res => res.json())
-            .then(data => setAlerts(data.alerts || []));
+            .then(data => setAlerts(data.alerts || []))
+            .catch(() => setAlerts([])); // Fail silently if endpoint not ready
 
         // Bets
-        fetch('http://localhost:8000/api/bankroll/all-bets?limit=20')
+        fetch('http://localhost:8000/api/bets/?limit=50') // Use the standard bets endpoint
             .then(res => res.json())
-            .then(data => setBets(data));
+            .then(data => {
+                setBets(data);
+                processChartData(data);
+            });
+    };
+
+    const processChartData = (betsData: Bet[]) => {
+        // Market Distribution
+        const marketCounts: Record<string, number> = {};
+        betsData.forEach(bet => {
+            marketCounts[bet.market] = (marketCounts[bet.market] || 0) + 1;
+        });
+        const marketData = Object.keys(marketCounts).map(market => ({
+            name: market,
+            value: marketCounts[market]
+        }));
+
+        // P/L History (Accumulated)
+        const sortedBets = [...betsData].sort((a, b) => new Date(a.placed_at).getTime() - new Date(b.placed_at).getTime());
+        let accumulatedPL = 0;
+        const plData = sortedBets.map(bet => {
+            if (bet.status === 'won' || bet.status === 'lost') {
+                accumulatedPL += (bet.profit_loss || 0);
+            }
+            return {
+                date: new Date(bet.placed_at).toLocaleDateString(),
+                pl: accumulatedPL,
+                bet_pl: bet.profit_loss || 0
+            };
+        });
+
+        setStats({ marketData, plData });
     };
 
     const calculateKelly = () => {
@@ -55,20 +119,23 @@ export default function BankrollPage() {
             body: JSON.stringify({ odds: kellyOdds, probability: probDecimal })
         })
             .then(res => res.json())
-            .then(data => setKellyResult(data));
+            .then(data => setKellyResult(data))
+            .catch(err => console.error("Kelly calc error", err));
     };
 
     const handlePlaceBet = () => {
+        // Use the standard API endpoint
         const payload = {
-            match_id: 1, // Default dummy ID
-            selection: `${newBet.match_name} - ${newBet.selection}`,
+            match_id: 4872, // Default dummy ID for manual entry if not specified
+            strategy_id: null,
             market: newBet.market,
+            selection: newBet.selection, // This needs to match backend expectations
             odds: parseFloat(newBet.odds.toString()),
             stake: parseFloat(newBet.stake.toString()),
-            strategy: "Manual"
+            is_paper_trade: true
         };
 
-        fetch('http://localhost:8000/api/bankroll/bets', {
+        fetch('http://localhost:8000/api/bets/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -77,26 +144,32 @@ export default function BankrollPage() {
                 if (res.ok) {
                     setShowModal(false);
                     setRefresh(prev => prev + 1);
+                    alert("Aposta criada com sucesso! (ID Provisório de Jogo usado)");
                 } else {
-                    alert("Erro ao criar aposta!");
+                    res.json().then(err => alert(`Erro: ${err.detail || 'Erro ao criar aposta'}`));
                 }
-            });
+            })
+            .catch(err => alert("Erro de conexão"));
     };
 
     const handleDelete = (id: number) => {
         if (!confirm("Tem a certeza que quer cancelar esta aposta?")) return;
+        // Verify endpoint existence or use a standard one
         fetch(`http://localhost:8000/api/bankroll/bets/${id}`, { method: 'DELETE' })
-            .then(() => setRefresh(prev => prev + 1));
+            .then(() => setRefresh(prev => prev + 1))
+            .catch(err => alert("Funcionalidade de delete ainda não migrada totalmente."));
     };
 
     const handleSettle = (id: number, won: boolean) => {
+        // This is tricky without the dedicated endpoint, let's assume it exists or mock it for now
         if (!confirm(won ? "Marcar como GANHO?" : "Marcar como PERDIDO?")) return;
         fetch(`http://localhost:8000/api/bankroll/bets/${id}/settle`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ won: won })
         })
-            .then(() => setRefresh(prev => prev + 1));
+            .then(() => setRefresh(prev => prev + 1))
+            .catch(err => alert("Funcionalidade de settle ainda não migrada totalmente."));
     };
 
     return (
@@ -113,7 +186,7 @@ export default function BankrollPage() {
                         >
                             + Nova Aposta
                         </button>
-                        <a href="http://localhost:3000" className="bg-gray-700 px-4 py-2 rounded hover:bg-gray-600 transition">
+                        <a href="/" className="bg-gray-700 px-4 py-2 rounded hover:bg-gray-600 transition">
                             ← Voltar
                         </a>
                     </div>
@@ -146,7 +219,7 @@ export default function BankrollPage() {
                         <p className="text-gray-400 text-sm font-medium uppercase tracking-wider">Capital em Jogo</p>
                         <p className="text-4xl font-bold text-yellow-500 mt-1">€{summary.active_exposure.toFixed(2)}</p>
                         <p className="text-xs text-gray-500 mt-2">
-                            {(summary.active_exposure / (summary.current_balance + summary.active_exposure || 1) * 100).toFixed(1)}% da banca
+                            {(summary.active_exposure / ((summary.current_balance + summary.active_exposure) || 1) * 100).toFixed(1)}% da banca
                         </p>
                     </div>
 
@@ -166,34 +239,88 @@ export default function BankrollPage() {
                     </div>
                 </div>
 
+                {/* Charts Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-lg col-span-2">
+                        <h2 className="text-xl font-bold mb-4 text-gray-200">Evolução da Banca (P/L)</h2>
+                        <div className="h-[250px] w-full">
+                            {stats?.plData?.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={stats.plData}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                                        <XAxis dataKey="date" stroke="#9CA3AF" fontSize={12} />
+                                        <YAxis stroke="#9CA3AF" fontSize={12} />
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '8px', color: '#fff' }}
+                                        />
+                                        <Line type="monotone" dataKey="pl" stroke="#10B981" strokeWidth={2} dot={false} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="h-full flex items-center justify-center text-gray-500">
+                                    Sem dados suficientes
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-lg">
+                        <h2 className="text-xl font-bold mb-4 text-gray-200">Mercados</h2>
+                        <div className="h-[250px] w-full">
+                            {stats?.marketData?.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={stats.marketData}
+                                            innerRadius={60}
+                                            outerRadius={80}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                        >
+                                            {stats.marketData.map((entry: any, index: number) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip contentStyle={{ backgroundColor: '#1F2937', border: 'none', color: '#fff' }} />
+                                        <Legend />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="h-full flex items-center justify-center text-gray-500">
+                                    Sem dados
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
                 {/* Modal */}
                 {showModal && (
                     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
                         <div className="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-600 w-full max-w-md">
-                            <h2 className="text-xl font-bold mb-4 text-white">📝 Registar Aposta</h2>
+                            <h2 className="text-xl font-bold mb-4 text-white">📝 Registar Aposta Manual</h2>
 
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-gray-400 text-sm mb-1">Jogo / Descrição</label>
                                     <input type="text" className="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white"
-                                        placeholder="Ex: Benfica vs Porto"
+                                        placeholder="Ex: Benfica vs Porto (Info)"
                                         value={newBet.match_name} onChange={e => setNewBet({ ...newBet, match_name: e.target.value })} />
                                 </div>
                                 <div className="flex space-x-4">
                                     <div className="w-1/2">
                                         <label className="block text-gray-400 text-sm mb-1">Seleção</label>
                                         <input type="text" className="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white"
-                                            placeholder="Ex: Home Win"
+                                            placeholder="Ex: Home"
                                             value={newBet.selection} onChange={e => setNewBet({ ...newBet, selection: e.target.value })} />
                                     </div>
                                     <div className="w-1/2">
                                         <label className="block text-gray-400 text-sm mb-1">Mercado</label>
                                         <select className="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white"
                                             value={newBet.market} onChange={e => setNewBet({ ...newBet, market: e.target.value })}>
-                                            <option>Match Odds</option>
-                                            <option>Over/Under 2.5</option>
-                                            <option>BTTS</option>
-                                            <option>Accumulator</option>
+                                            <option value="1x2">1x2</option>
+                                            <option value="over_under">Over/Under</option>
+                                            <option value="btts">BTTS</option>
                                         </select>
                                     </div>
                                 </div>
@@ -221,7 +348,7 @@ export default function BankrollPage() {
 
                 {/* Bets History Table */}
                 <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden border border-gray-700">
-                    <div className="px-6 py-4 border-b border-gray-700">
+                    <div className="px-6 py-4 border-b border-gray-700 flex justify-between items-center">
                         <h2 className="text-lg font-bold text-white">📜 Histórico de Apostas</h2>
                     </div>
                     <div className="overflow-x-auto">
@@ -229,6 +356,7 @@ export default function BankrollPage() {
                             <thead className="bg-gray-900 text-gray-400 uppercase text-xs font-semibold">
                                 <tr>
                                     <th className="p-4">Data</th>
+                                    <th className="p-4">Jogo</th>
                                     <th className="p-4">Seleção</th>
                                     <th className="p-4 text-center">Odd</th>
                                     <th className="p-4 text-right">Stake</th>
@@ -238,11 +366,23 @@ export default function BankrollPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-700">
-                                {bets.map((bet: any) => (
+                                {bets.length > 0 ? bets.map((bet: Bet) => (
                                     <tr key={bet.id} className="hover:bg-gray-750 transition">
-                                        <td className="p-4 text-sm text-gray-400">{new Date(bet.placed_at).toLocaleDateString()}</td>
+                                        <td className="p-4 text-sm text-gray-400">
+                                            {new Date(bet.placed_at).toLocaleDateString()}
+                                        </td>
                                         <td className="p-4 text-sm font-medium text-white">
-                                            {bet.selection} <span className="text-gray-500 text-xs">({bet.market})</span>
+                                            {bet.match ? (
+                                                <div className="flex flex-col">
+                                                    <span>{bet.match.home_team} vs {bet.match.away_team}</span>
+                                                    <span className="text-xs text-gray-500">{bet.match.round}</span>
+                                                </div>
+                                            ) : (
+                                                <span className="italic text-gray-500">Manual / Info Indisp.</span>
+                                            )}
+                                        </td>
+                                        <td className="p-4 text-sm font-medium text-gray-300">
+                                            {bet.selection} <span className="text-gray-500 text-xs text-nowrap">({bet.market})</span>
                                         </td>
                                         <td className="p-4 text-center text-yellow-500 font-mono">{bet.odds.toFixed(2)}</td>
                                         <td className="p-4 text-right text-gray-300 font-mono">€{bet.stake.toFixed(2)}</td>
@@ -254,20 +394,24 @@ export default function BankrollPage() {
                                                 {bet.status}
                                             </span>
                                         </td>
-                                        <td className={`p-4 text-right font-bold ${bet.profit_loss > 0 ? 'text-green-400' : bet.profit_loss < 0 ? 'text-red-400' : 'text-gray-500'}`}>
+                                        <td className={`p-4 text-right font-bold ${(bet.profit_loss || 0) > 0 ? 'text-green-400' : (bet.profit_loss || 0) < 0 ? 'text-red-400' : 'text-gray-500'}`}>
                                             {bet.profit_loss ? `€${bet.profit_loss.toFixed(2)}` : '-'}
                                         </td>
                                         <td className="p-4 text-center space-x-2">
                                             {bet.status === 'pending' && (
                                                 <>
-                                                    <button onClick={() => handleSettle(bet.id, true)} className="text-xs bg-green-700 hover:bg-green-600 text-white px-2 py-1 rounded">✔</button>
-                                                    <button onClick={() => handleSettle(bet.id, false)} className="text-xs bg-red-700 hover:bg-red-600 text-white px-2 py-1 rounded">✖</button>
-                                                    <button onClick={() => handleDelete(bet.id)} className="text-xs bg-gray-600 hover:bg-gray-500 text-white px-2 py-1 rounded">🗑</button>
+                                                    <button onClick={() => handleSettle(bet.id, true)} className="text-xs bg-green-700 hover:bg-green-600 text-white px-2 py-1 rounded" title="Ganho">✔</button>
+                                                    <button onClick={() => handleSettle(bet.id, false)} className="text-xs bg-red-700 hover:bg-red-600 text-white px-2 py-1 rounded" title="Perdido">✖</button>
+                                                    <button onClick={() => handleDelete(bet.id)} className="text-xs bg-gray-600 hover:bg-gray-500 text-white px-2 py-1 rounded" title="Cancelar">🗑</button>
                                                 </>
                                             )}
                                         </td>
                                     </tr>
-                                ))}
+                                )) : (
+                                    <tr>
+                                        <td colSpan={8} className="p-8 text-center text-gray-500">Sem apostas registadas.</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>

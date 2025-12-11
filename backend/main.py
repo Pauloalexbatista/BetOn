@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 
-from api.routes import analysis, bankroll, strategies, signals, matches, bets, system
+from api.routes import analysis, bankroll, strategies, signals, matches, bets, system, pareto_teams
 from database.database import init_db
 
 # Configure logging
@@ -36,7 +36,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -44,12 +44,14 @@ app.add_middleware(
 
 # Routes
 app.include_router(analysis.router, prefix="/api/analysis", tags=["Analysis"])
+app.include_router(pareto_teams.router, prefix="/api/analysis", tags=["Analysis"])
 app.include_router(bankroll.router, prefix="/api/bankroll", tags=["Bankroll"])
 app.include_router(strategies.router, prefix="/api/strategies", tags=["Strategies"])
 app.include_router(signals.router, prefix="/api/signals", tags=["Signals"])
 app.include_router(matches.router, prefix="/api/matches", tags=["Matches"])
 app.include_router(bets.router, prefix="/api/bets", tags=["Bets"])
 app.include_router(system.router, prefix="/api/system", tags=["System"])
+
 
 @app.get("/health")
 async def health():

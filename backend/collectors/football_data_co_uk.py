@@ -30,6 +30,39 @@ class FootballDataCoUkCollector:
         "D1": "Bundesliga",
         "F1": "Ligue 1"
     }
+    
+    # Team name normalization (English → Portuguese)
+    TEAM_NAME_MAP = {
+        # Sporting variations
+        "Sp Lisbon": "Sporting",
+        "Sporting Clube de Portugal": "Sporting",
+        "Sporting CP": "Sporting",
+        
+        # Benfica variations
+        "Sport Lisboa e Benfica": "Benfica",
+        "SL Benfica": "Benfica",
+        
+        # Porto variations
+        "FC Porto": "Porto",
+        
+        # Braga variations
+        "Sp Braga": "SC Braga",
+        "Sporting Clube de Braga": "SC Braga",
+        "Sporting Braga": "SC Braga",
+
+        # New Consolidations (Approved 2025-12-10)
+        "FC Arouca": "Arouca",
+        "GD Estoril Praia": "Estoril",
+        "CF Estrela da Amadora": "Estrela",
+        "FC Famalicão": "Famalicao",
+        "FC FamalicÒo": "Famalicao",
+        "SC Farense": "Farense",
+        "Vitória Guimarães": "Guimaraes",
+        "Vit¾ria GuimarÒes": "Guimaraes",
+        "CD Nacional": "Nacional",
+        "CD Santa Clara": "Santa Clara",
+        "Casa Pia AC": "Casa Pia",
+    }
 
     def __init__(self, db: Session = None):
         self.db = db if db else SessionLocal()
@@ -140,7 +173,9 @@ class FootballDataCoUkCollector:
         logger.info(f"[{league_name} {season_code}] Sync Complete. New: {count_new}, Updated: {count_updated}")
 
     def _get_or_create_team(self, team_name: str, context: str) -> Team:
+        # Normalize team name first
         name = team_name.strip()
+        name = self.TEAM_NAME_MAP.get(name, name)  # Apply mapping if exists
         
         # Basic caching/checking
         team = self.db.query(Team).filter(Team.name == name).first()
