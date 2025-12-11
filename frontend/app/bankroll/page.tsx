@@ -271,7 +271,7 @@ export default function BankrollPage() {
                                                 if (res.ok) {
                                                     alert(data.message);
                                                     input.value = '';  // Clear input
-                                                    setRefresh(prev => prev + 1);
+                                                    fetchData();  // Immediately refresh data
                                                 } else {
                                                     alert(`Erro: ${data.detail}`);
                                                 }
@@ -309,7 +309,7 @@ export default function BankrollPage() {
                                                 if (res.ok) {
                                                     alert(data.message);
                                                     input.value = '';  // Clear input
-                                                    setRefresh(prev => prev + 1);
+                                                    fetchData();  // Immediately refresh data
                                                 } else {
                                                     alert(`Erro: ${data.detail}`);
                                                 }
