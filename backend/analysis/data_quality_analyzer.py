@@ -6,7 +6,7 @@ Analyzes database quality, completeness, and identifies issues across data sourc
 import logging
 from typing import Dict, List, Any, Optional
 from sqlalchemy.orm import Session
-from sqlalchemy import func, and_, or_
+from sqlalchemy import func, and_, or_, case
 from datetime import datetime, timedelta
 
 from database.models import Team, Match, Odds
@@ -184,8 +184,8 @@ class DataQualityAnalyzer:
             league_stats = self.db.query(
                 Match.league,
                 func.count(Match.id).label('total'),
-                func.sum(func.case((Match.status == 'finished', 1), else_=0)).label('finished'),
-                func.sum(func.case((Match.status == 'scheduled', 1), else_=0)).label('scheduled')
+                func.sum(case((Match.status == 'finished', 1), else_=0)).label('finished'),
+                func.sum(case((Match.status == 'scheduled', 1), else_=0)).label('scheduled')
             ).group_by(Match.league).all()
             
             leagues = [
