@@ -176,3 +176,20 @@ class BankrollHistory(Base):
     
     timestamp = Column(DateTime, default=datetime.utcnow)
     notes = Column(String)
+
+
+class BankrollSettings(Base):
+    """Bankroll configuration settings"""
+    __tablename__ = "bankroll_settings"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    
+    # Configuration values
+    initial_balance = Column(Float, default=1000.0, nullable=False)
+    default_stake_percentage = Column(Float, default=2.0)  # Percentage of bankroll
+    max_exposure = Column(Float, default=200.0)  # Maximum total capital at risk
+    
+    # Metadata
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+

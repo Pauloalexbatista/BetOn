@@ -4,7 +4,7 @@ from typing import List, Dict
 from pydantic import BaseModel
 
 from database.database import get_db
-from database.models import Bet, BankrollHistory
+from database.models import Bet, BankrollHistory, BankrollSettings
 from bankroll.manager import BankrollManager
 from bankroll.kelly import calculate_kelly_stake
 from bankroll.risk import RiskManager
@@ -26,6 +26,18 @@ class BetSettlement(BaseModel):
 class KellyRequest(BaseModel):
     odds: float
     probability: float # 0.0 - 1.0
+
+class SetBalanceRequest(BaseModel):
+    new_balance: float
+
+class AdjustBalanceRequest(BaseModel):
+    adjustment: float  # Can be positive or negative
+
+class SetStakePercentageRequest(BaseModel):
+    stake_percentage: float  # 0-100
+
+class SetMaxExposureRequest(BaseModel):
+    max_exposure: float
 
 # Endpoints
 
@@ -135,4 +147,145 @@ def calculate_kelly(req: KellyRequest, db: Session = Depends(get_db)):
         "recommended_stake": stake,
         "bankroll": balance,
         "percent": round((stake/balance)*100, 2) if balance > 0 else 0
+    }
+
+# New Bankroll Settings Endpoints
+
+@router.get("/settings")
+def get_bankroll_settings(db: Session = Depends(get_db)):
+    """Get current bankroll settings"""
+    settings = db.query(BankrollSettings).first()
+    if not settings:
+        # Create default settings if none exist
+        settings = BankrollSettings(
+            initial_balance=1000.0,
+            default_stake_percentage=2.0,
+            max_exposure=200.0
+        )
+        db.add(settings)
+        db.commit()
+        db.refresh(settings)
+    
+    return {
+        "initial_balance": settings.initial_balance,
+        "default_stake_percentage": settings.default_stake_percentage,
+        "max_exposure": settings.max_exposure,
+        "updated_at": settings.updated_at
+    }
+
+@router.post("/set-balance")
+def set_balance(req: SetBalanceRequest, db: Session = Depends(get_db)):
+    """Set new bankroll balance"""
+    if req.new_balance < 0:
+        raise HTTPException(status_code=400, detail="Balance cannot be negative")
+    
+    settings = db.query(BankrollSettings).first()
+    if not settings:
+        settings = BankrollSettings()
+        db.add(settings)
+    
+    old_balance = settings.initial_balance
+    settings.initial_balance = req.new_balance
+    db.commit()
+    
+    # Log the change in history
+    history_entry = BankrollHistory(
+        balance=req.new_balance,
+        change=req.new_balance - old_balance,
+        reason="balance_set",
+        notes=f"Balance manually set from €{old_balance:.2f} to €{req.new_balance:.2f}"
+    )
+    db.add(history_entry)
+    db.commit()
+    
+    return {
+        "success": True,
+        "new_balance": req.new_balance,
+        "previous_balance": old_balance,
+        "message": f"Balance updated to €{req.new_balance:.2f}"
+    }
+
+@router.post("/adjust-balance")
+def adjust_balance(req: AdjustBalanceRequest, db: Session = Depends(get_db)):
+    """Adjust bankroll balance by a positive or negative amount"""
+    settings = db.query(BankrollSettings).first()
+    if not settings:
+        settings = BankrollSettings()
+        db.add(settings)
+        db.commit()
+        db.refresh(settings)
+    
+    new_balance = settings.initial_balance + req.adjustment
+    
+    if new_balance < 0:
+        raise HTTPException(status_code=400, detail="Adjusted balance cannot be negative")
+    
+    old_balance = settings.initial_balance
+    settings.initial_balance = new_balance
+    db.commit()
+    
+    # Log the adjustment
+    adjustment_type = "increased" if req.adjustment > 0 else "decreased"
+    history_entry = BankrollHistory(
+        balance=new_balance,
+        change=req.adjustment,
+        reason="balance_adjusted",
+        notes=f"Balance {adjustment_type} by €{abs(req.adjustment):.2f}"
+    )
+    db.add(history_entry)
+    db.commit()
+    
+    return {
+        "success": True,
+        "new_balance": new_balance,
+        "adjustment": req.adjustment,
+        "message": f"Balance {adjustment_type} by €{abs(req.adjustment):.2f}"
+    }
+
+@router.post("/set-stake-percentage")
+def set_stake_percentage(req: SetStakePercentageRequest, db: Session = Depends(get_db)):
+    """Set default stake percentage"""
+    if req.stake_percentage < 0 or req.stake_percentage > 100:
+        raise HTTPException(status_code=400, detail="Stake percentage must be between 0 and 100")
+    
+    settings = db.query(BankrollSettings).first()
+    if not settings:
+        settings = BankrollSettings()
+        db.add(settings)
+    
+    settings.default_stake_percentage = req.stake_percentage
+    db.commit()
+    db.refresh(settings)
+    
+    stake_amount = (settings.initial_balance * req.stake_percentage / 100)
+    
+    return {
+        "success": True,
+        "stake_percentage": req.stake_percentage,
+        "stake_amount": round(stake_amount, 2),
+        "message": f"Default stake set to {req.stake_percentage}% (€{stake_amount:.2f})"
+    }
+
+@router.post("/set-max-exposure")
+def set_max_exposure(req: SetMaxExposureRequest, db: Session = Depends(get_db)):
+    """Set maximum exposure limit"""
+    if req.max_exposure < 0:
+        raise HTTPException(status_code=400, detail="Max exposure cannot be negative")
+    
+    settings = db.query(BankrollSettings).first()
+    if not settings:
+        settings = BankrollSettings()
+        db.add(settings)
+    
+    settings.max_exposure = req.max_exposure
+    db.commit()
+    db.refresh(settings)
+    
+    percent_of_bankroll = (req.max_exposure / settings.initial_balance * 100) if settings.initial_balance > 0 else 0
+    
+    return {
+        "success": True,
+        "max_exposure": req.max_exposure,
+        "percent_of_bankroll": round(percent_of_bankroll, 1),
+        "message": f"Max exposure set to €{req.max_exposure:.2f} ({percent_of_bankroll:.1f}%)"
     }

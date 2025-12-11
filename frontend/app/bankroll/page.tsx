@@ -257,13 +257,27 @@ export default function BankrollPage() {
                                     id="newBalance"
                                 />
                                 <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                         const input = document.getElementById('newBalance') as HTMLInputElement;
                                         const newValue = parseFloat(input.value);
                                         if (newValue && newValue > 0) {
-                                            // TODO: Call API to update balance
-                                            alert(`Banca atualizada para €${newValue.toFixed(2)}`);
-                                            setRefresh(prev => prev + 1);
+                                            try {
+                                                const res = await fetch('http://localhost:8000/api/bankroll/set-balance', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ new_balance: newValue })
+                                                });
+                                                const data = await res.json();
+                                                if (res.ok) {
+                                                    alert(data.message);
+                                                    input.value = '';  // Clear input
+                                                    setRefresh(prev => prev + 1);
+                                                } else {
+                                                    alert(`Erro: ${data.detail}`);
+                                                }
+                                            } catch (err) {
+                                                alert('Erro ao conectar ao servidor');
+                                            }
                                         }
                                     }}
                                     className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 rounded text-sm font-bold"
@@ -281,17 +295,26 @@ export default function BankrollPage() {
                                     id="adjustBalance"
                                 />
                                 <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                         const input = document.getElementById('adjustBalance') as HTMLInputElement;
                                         const adjustment = parseFloat(input.value);
                                         if (adjustment) {
-                                            const newBalance = summary.current_balance + adjustment;
-                                            if (newBalance >= 0) {
-                                                // TODO: Call API to adjust balance
-                                                alert(`Banca ${adjustment > 0 ? 'aumentada' : 'diminuída'} em €${Math.abs(adjustment).toFixed(2)}`);
-                                                setRefresh(prev => prev + 1);
-                                            } else {
-                                                alert('Saldo não pode ser negativo!');
+                                            try {
+                                                const res = await fetch('http://localhost:8000/api/bankroll/adjust-balance', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ adjustment: adjustment })
+                                                });
+                                                const data = await res.json();
+                                                if (res.ok) {
+                                                    alert(data.message);
+                                                    input.value = '';  // Clear input
+                                                    setRefresh(prev => prev + 1);
+                                                } else {
+                                                    alert(`Erro: ${data.detail}`);
+                                                }
+                                            } catch (err) {
+                                                alert('Erro ao conectar ao servidor');
                                             }
                                         }
                                     }}
@@ -320,13 +343,25 @@ export default function BankrollPage() {
                                 />
                                 <span className="text-white text-sm">%</span>
                                 <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                         const input = document.getElementById('stakePercent') as HTMLInputElement;
                                         const percentage = parseFloat(input.value);
                                         if (percentage && percentage > 0 && percentage <= 100) {
-                                            // TODO: Call API to update default stake %
-                                            const stakeAmount = (summary.current_balance * percentage / 100).toFixed(2);
-                                            alert(`Stake padrão: ${percentage}% = €${stakeAmount}`);
+                                            try {
+                                                const res = await fetch('http://localhost:8000/api/bankroll/set-stake-percentage', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ stake_percentage: percentage })
+                                                });
+                                                const data = await res.json();
+                                                if (res.ok) {
+                                                    alert(data.message);
+                                                } else {
+                                                    alert(`Erro: ${data.detail}`);
+                                                }
+                                            } catch (err) {
+                                                alert('Erro ao conectar ao servidor');
+                                            }
                                         }
                                     }}
                                     className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 rounded text-sm font-bold"
@@ -353,13 +388,26 @@ export default function BankrollPage() {
                                     id="maxExposure"
                                 />
                                 <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                         const input = document.getElementById('maxExposure') as HTMLInputElement;
                                         const maxValue = parseFloat(input.value);
                                         if (maxValue && maxValue > 0) {
-                                            const percentOfBankroll = ((maxValue / summary.current_balance) * 100).toFixed(1);
-                                            // TODO: Call API to update max exposure
-                                            alert(`Exposição máxima: €${maxValue.toFixed(2)} (${percentOfBankroll}% da banca)`);
+                                            try {
+                                                const res = await fetch('http://localhost:8000/api/bankroll/set-max-exposure', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ max_exposure: maxValue })
+                                                });
+                                                const data = await res.json();
+                                                if (res.ok) {
+                                                    alert(data.message);
+                                                    input.value = '';  // Clear input
+                                                } else {
+                                                    alert(`Erro: ${data.detail}`);
+                                                }
+                                            } catch (err) {
+                                                alert('Erro ao conectar ao servidor');
+                                            }
                                         }
                                     }}
                                     className="bg-red-600 hover:bg-red-500 text-white px-4 rounded text-sm font-bold"
