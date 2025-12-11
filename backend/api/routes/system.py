@@ -2,20 +2,18 @@
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import Dict, Any
-from scripts.update_results import update_all
 from database.database import get_db
 import logging
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-@router.post("/update")
-async def trigger_update(background_tasks: BackgroundTasks):
-    """
-    Trigger a full system update (Results + Schedule) in the background.
-    """
-    background_tasks.add_task(update_all)
-    return {"message": "Update started in background. Check logs for progress."}
+# DEPRECATED: Old update endpoint - use Data Quality Dashboard instead
+# @router.post("/update")
+# async def trigger_update(background_tasks: BackgroundTasks):
+#     """Trigger a full system update (Results + Schedule) in the background."""
+#     # NOTE: update_all() is deprecated - use /collect-odds instead
+#     return {"message": "This endpoint is deprecated. Use /collect-odds instead."}
 
 @router.get("/status")
 async def get_system_status():
@@ -176,8 +174,8 @@ async def get_database_status(db: Session = Depends(get_db)) -> Dict[str, Any]:
             "leagues": leagues_data,
             "warnings": warnings,
             "suggestions": [
-                "Run: python collectors/football_data_co_uk.py" if matches_total == 0 else None,
-                "Run: python collectors/schedule_collector.py" if matches_scheduled == 0 else None
+                "Use Data Quality Dashboard 'Executar Odds Collector' button" if matches_total == 0 else None,
+                "Run odds collector - it auto-creates fixtures" if matches_scheduled == 0 else None
             ]
         }
         

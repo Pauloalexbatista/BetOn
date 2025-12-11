@@ -1,0 +1,90 @@
+feat: Data Quality Dashboard and Live Odds Collection System (v0.3.0)
+
+## 🎯 Overview
+Complete data strategy overhaul implementing real-time odds collection,
+data quality monitoring, and intelligent team management.
+
+## ✨ New Features
+
+### Data Quality Dashboard (/data-quality)
+- Real-time metrics for teams, matches, and odds
+- Health indicators (green/yellow/red)
+- Manual trigger buttons:
+  * "Executar Odds Collector" - Fetch live odds
+  * "Consolidar Duplicados" - Merge similar teams
+- Actionable recommendations system
+- Last run tracking for collectors
+
+### Live Odds Collection
+- New collector using The Odds API (free tier)
+- Auto-creates fixtures when they don't exist in DB
+- Auto-creates teams when needed
+- Supports 31 real bookmakers across 6 European leagues
+- Replaces deprecated collectors (API-Football, FootballDataCoUk)
+
+### Smart Team Consolidation
+- Fuzzy matching for duplicate detection
+- Blacklist protection (Man United ≠ Man City)
+- Intelligent primary team selection
+- Configurable similarity thresholds
+
+### Homepage Improvements
+- Reorganized layout (Status/Mode/Bankroll at top)
+- Duplicate filtering for daily signals
+- "Limpar Todas" button for opportunities
+- Functional "Analisar" buttons (link to /matches)
+- Disabled dangerous "Update Games" button
+
+## 🔧 Technical Changes
+
+### Backend
+- `collectors/live_odds_collector.py` - Main data pipeline
+- `scripts/consolidate_teams_smart.py` - Intelligent team merging
+- `scripts/normalize_historical_odds.py` - Historical data cleanup
+- `analysis/data_quality_analyzer.py` - Dashboard data provider
+- `api/routes/system.py` - New endpoints for dashboard
+- `api/routes/signals.py` - Clear signals endpoint
+
+### Frontend
+- `app/data-quality/page.tsx` - Complete quality dashboard
+- `app/page.tsx` - Homepage reorganization
+
+### Scripts
+- `reset_recent_data.py` - Safe data cleanup utility
+- `check_scheduled.py` - Match verification tool
+- Multiple test scripts for API validation
+
+## 📊 Data Migration
+- Normalized 8,231 historical odds to neutral value (1.30)
+- Honest representation of data quality
+- Preserved data structure for future improvements
+
+## 🚫 Deprecated
+- FootballDataCoUkCollector (replaced by The Odds API)
+- ScheduleCollector using API-Football (free tier limitation)
+- "Update Games" button (uses old collectors)
+
+## 📝 Documentation
+- Complete ROADMAP.md rewrite with Phase 2 completion
+- Comprehensive README.md with button reference
+- Detailed walkthrough.md with troubleshooting
+- Updated task.md with current state
+
+## 🎯 Current State
+- Teams: 154 (clean)
+- Matches: 2,423 (240 scheduled)
+- Odds: 21,606 (8,231 neutral + 13,375 real)
+- Bookmakers: 31 real sources
+- API Usage: 480/500 requests remaining (96%)
+
+## 🔗 Related
+- Closes: Data Quality Issues
+- Implements: Live Odds Strategy
+- Fixes: Team Duplicate Problems
+- Disables: Dangerous Update Button
+
+---
+
+**Breaking Changes:** None (additive only)
+**Migration Required:** No (automatic on startup)
+**API Changes:** New endpoints added to /api/system/
