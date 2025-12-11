@@ -110,38 +110,7 @@ export default function Home() {
 
                 {/* Quick Links - AFTER STATUS */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-                    <a
-                        href="/matches"
-                        className="bg-slate-700 hover:bg-slate-600 text-white rounded-lg p-6 text-center transition-colors"
-                    >
-                        <div className="text-3xl mb-2">⚽</div>
-                        <h3 className="font-semibold">Jogos</h3>
-                    </a>
-
-                    <a
-                        href="/bets"
-                        className="bg-slate-700 hover:bg-slate-600 text-white rounded-lg p-6 text-center transition-colors"
-                    >
-                        <div className="text-3xl mb-2">🎯</div>
-                        <h3 className="font-semibold">Apostas</h3>
-                    </a>
-
-                    <a
-                        href="/strategies"
-                        className="bg-slate-700 hover:bg-slate-600 text-white rounded-lg p-6 text-center transition-colors"
-                    >
-                        <div className="text-3xl mb-2">🧠</div>
-                        <h3 className="font-semibold">Estratégias</h3>
-                    </a>
-
-                    <a
-                        href="/analysis/league"
-                        className="bg-slate-700 hover:bg-slate-600 text-white rounded-lg p-6 text-center transition-colors"
-                    >
-                        <div className="text-3xl mb-2">💓</div>
-                        <h3 className="font-semibold">Pulso</h3>
-                    </a>
-
+                    {/* 1. Calendário */}
                     <a
                         href="/calendar"
                         className="bg-slate-700 hover:bg-slate-600 text-white rounded-lg p-6 text-center transition-colors"
@@ -150,14 +119,26 @@ export default function Home() {
                         <h3 className="font-semibold">Calendário</h3>
                     </a>
 
+                    {/* 2. Jogos */}
                     <a
-                        href="/bankroll"
+                        href="/matches"
                         className="bg-slate-700 hover:bg-slate-600 text-white rounded-lg p-6 text-center transition-colors"
                     >
-                        <div className="text-3xl mb-2">💰</div>
-                        <h3 className="font-semibold">Banca</h3>
+                        <div className="text-3xl mb-2">⚽</div>
+                        <h3 className="font-semibold">Jogos</h3>
                     </a>
 
+                    {/* 3. Análises de Mercados */}
+                    <a
+                        href="/analysis/markets"
+                        className="bg-gradient-to-br from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg p-6 text-center transition-all shadow-lg hover:shadow-emerald-500/50"
+                    >
+                        <div className="text-3xl mb-2">📈</div>
+                        <h3 className="font-semibold">Análises de Mercados</h3>
+                        <p className="text-xs mt-1 opacity-90">Over/Under, BTTS, 1X2</p>
+                    </a>
+
+                    {/* 4. Análise Pareto */}
                     <a
                         href="/analysis/pareto"
                         className="bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-lg p-6 text-center transition-all shadow-lg hover:shadow-purple-500/50"
@@ -167,20 +148,51 @@ export default function Home() {
                         <p className="text-xs mt-1 opacity-90">Top 20% Equipas</p>
                     </a>
 
+                    {/* 5. Mercados (duplicado? - mantido para legacy) */}
+                    {/* Removido para evitar duplicação */}
+
+                    {/* 6. Pulso */}
                     <a
-                        href="/analysis/markets"
-                        className="bg-gradient-to-br from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg p-6 text-center transition-all shadow-lg hover:shadow-emerald-500/50"
+                        href="/analysis/league"
+                        className="bg-slate-700 hover:bg-slate-600 text-white rounded-lg p-6 text-center transition-colors"
                     >
-                        <div className="text-3xl mb-2">📈</div>
-                        <h3 className="font-semibold">Mercados</h3>
-                        <p className="text-xs mt-1 opacity-90">Over/Under, BTTS, 1X2</p>
+                        <div className="text-3xl mb-2">💓</div>
+                        <h3 className="font-semibold">Pulso</h3>
                     </a>
 
+                    {/* 7. Estratégias */}
+                    <a
+                        href="/strategies"
+                        className="bg-slate-700 hover:bg-slate-600 text-white rounded-lg p-6 text-center transition-colors"
+                    >
+                        <div className="text-3xl mb-2">🧠</div>
+                        <h3 className="font-semibold">Estratégias</h3>
+                    </a>
+
+                    {/* 8. Apostas */}
+                    <a
+                        href="/bets"
+                        className="bg-slate-700 hover:bg-slate-600 text-white rounded-lg p-6 text-center transition-colors"
+                    >
+                        <div className="text-3xl mb-2">🎯</div>
+                        <h3 className="font-semibold">Apostas</h3>
+                    </a>
+
+                    {/* 9. Banca */}
+                    <a
+                        href="/bankroll"
+                        className="bg-slate-700 hover:bg-slate-600 text-white rounded-lg p-6 text-center transition-colors"
+                    >
+                        <div className="text-3xl mb-2">💰</div>
+                        <h3 className="font-semibold">Gestão de Banca</h3>
+                    </a>
+
+                    {/* Data Quality - Extra (mantido) */}
                     <a
                         href="/data-quality"
                         className="bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-lg p-6 text-center transition-all shadow-lg hover:shadow-blue-500/50"
                     >
-                        <div className="text-3xl mb-2">📊</div>
+                        <div className="text-3xl mb-2">🔍</div>
                         <h3 className="font-semibold">Data Quality</h3>
                         <p className="text-xs mt-1 opacity-90">Monitor de Dados</p>
                     </a>

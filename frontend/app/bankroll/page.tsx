@@ -239,6 +239,141 @@ export default function BankrollPage() {
                     </div>
                 </div>
 
+                {/* Bankroll Management Controls - NEW SECTION */}
+                <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-xl mb-8">
+                    <h2 className="text-xl font-bold mb-4 text-emerald-400">⚙️ Configurações de Banca</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Edit Balance */}
+                        <div className="bg-gray-900/50 p-4 rounded-lg">
+                            <label className="block text-gray-400 text-sm font-medium mb-2">
+                                💰 Saldo da Banca
+                            </label>
+                            <div className="flex gap-2 mb-2">
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    placeholder="Novo saldo"
+                                    className="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm"
+                                    id="newBalance"
+                                />
+                                <button
+                                    onClick={() => {
+                                        const input = document.getElementById('newBalance') as HTMLInputElement;
+                                        const newValue = parseFloat(input.value);
+                                        if (newValue && newValue > 0) {
+                                            // TODO: Call API to update balance
+                                            alert(`Banca atualizada para €${newValue.toFixed(2)}`);
+                                            setRefresh(prev => prev + 1);
+                                        }
+                                    }}
+                                    className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 rounded text-sm font-bold"
+                                >
+                                    Set
+                                </button>
+                            </div>
+                            <div className="text-xs text-gray-500 mb-2">ou ajustar:</div>
+                            <div className="flex gap-2">
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    placeholder="+/- valor"
+                                    className="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm"
+                                    id="adjustBalance"
+                                />
+                                <button
+                                    onClick={() => {
+                                        const input = document.getElementById('adjustBalance') as HTMLInputElement;
+                                        const adjustment = parseFloat(input.value);
+                                        if (adjustment) {
+                                            const newBalance = summary.current_balance + adjustment;
+                                            if (newBalance >= 0) {
+                                                // TODO: Call API to adjust balance
+                                                alert(`Banca ${adjustment > 0 ? 'aumentada' : 'diminuída'} em €${Math.abs(adjustment).toFixed(2)}`);
+                                                setRefresh(prev => prev + 1);
+                                            } else {
+                                                alert('Saldo não pode ser negativo!');
+                                            }
+                                        }
+                                    }}
+                                    className="bg-blue-600 hover:bg-blue-500 text-white px-4 rounded text-sm font-bold"
+                                >
+                                    +/-
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Edit Default Stake % */}
+                        <div className="bg-gray-900/50 p-4 rounded-lg">
+                            <label className="block text-gray-400 text-sm font-medium mb-2">
+                                📊 % Stake Padrão
+                            </label>
+                            <div className="flex gap-2 items-center">
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    min="0"
+                                    max="100"
+                                    placeholder="% da banca"
+                                    defaultValue="2.0"
+                                    className="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm"
+                                    id="stakePercent"
+                                />
+                                <span className="text-white text-sm">%</span>
+                                <button
+                                    onClick={() => {
+                                        const input = document.getElementById('stakePercent') as HTMLInputElement;
+                                        const percentage = parseFloat(input.value);
+                                        if (percentage && percentage > 0 && percentage <= 100) {
+                                            // TODO: Call API to update default stake %
+                                            const stakeAmount = (summary.current_balance * percentage / 100).toFixed(2);
+                                            alert(`Stake padrão: ${percentage}% = €${stakeAmount}`);
+                                        }
+                                    }}
+                                    className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 rounded text-sm font-bold"
+                                >
+                                    Save
+                                </button>
+                            </div>
+                            <div className="text-xs text-gray-500 mt-2">
+                                Valor sugerido: 1-5% da banca
+                            </div>
+                        </div>
+
+                        {/* Edit Max Exposure */}
+                        <div className="bg-gray-900/50 p-4 rounded-lg">
+                            <label className="block text-gray-400 text-sm font-medium mb-2">
+                                ⚠️ Exposição Máxima (€)
+                            </label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    placeholder="Máximo em jogo"
+                                    className="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm"
+                                    id="maxExposure"
+                                />
+                                <button
+                                    onClick={() => {
+                                        const input = document.getElementById('maxExposure') as HTMLInputElement;
+                                        const maxValue = parseFloat(input.value);
+                                        if (maxValue && maxValue > 0) {
+                                            const percentOfBankroll = ((maxValue / summary.current_balance) * 100).toFixed(1);
+                                            // TODO: Call API to update max exposure
+                                            alert(`Exposição máxima: €${maxValue.toFixed(2)} (${percentOfBankroll}% da banca)`);
+                                        }
+                                    }}
+                                    className="bg-red-600 hover:bg-red-500 text-white px-4 rounded text-sm font-bold"
+                                >
+                                    Set
+                                </button>
+                            </div>
+                            <div className="text-xs text-gray-500 mt-2">
+                                Atual: €{summary.active_exposure.toFixed(2)} ({((summary.active_exposure / ((summary.current_balance + summary.active_exposure) || 1)) * 100).toFixed(1)}%)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Charts Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
                     <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-lg col-span-2">
