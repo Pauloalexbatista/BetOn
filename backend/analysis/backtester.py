@@ -50,6 +50,7 @@ class Backtester:
             data = odd_entry.odds_data
             if not data: continue
             
+            # NOTE: Odds data stored by live_odds_collector from The Odds API
             val = data.get(json_key)
             if val:
                 return float(val)
