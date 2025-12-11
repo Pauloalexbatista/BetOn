@@ -187,3 +187,203 @@ async def get_database_status(db: Session = Depends(get_db)) -> Dict[str, Any]:
             "status": "error",
             "error": str(e)
         }
+
+
+# Simple cache for data quality report (5 minute TTL)
+_quality_report_cache = {"report": None, "timestamp": None}
+_CACHE_TTL_SECONDS = 300  # 5 minutes
+
+
+
+
+@router.get("/data-quality")
+async def get_data_quality(db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """
+    Get comprehensive data quality report.
+    Analyzes teams, matches, odds coverage, and identifies gaps.
+    Results are cached for 5 minutes to avoid expensive queries.
+    """
+    from analysis.data_quality_analyzer import DataQualityAnalyzer
+    from datetime import datetime, timedelta
+    
+    try:
+        # Check cache
+        now = datetime.now()
+        if _quality_report_cache["report"] and _quality_report_cache["timestamp"]:
+            age = (now - _quality_report_cache["timestamp"]).total_seconds()
+            if age < _CACHE_TTL_SECONDS:
+                logger.info(f"Returning cached quality report (age: {age:.1f}s)")
+                return _quality_report_cache["report"]
+        
+        # Generate fresh report
+        logger.info("Generating fresh data quality report...")
+        analyzer = DataQualityAnalyzer(db)
+        report = analyzer.generate_quality_report()
+        
+        # Add odds collector info
+        report["odds_collector"] = get_collector_status(db)
+        
+        # Update cache
+        _quality_report_cache["report"] = report
+        _quality_report_cache["timestamp"] = now
+        
+        return report
+        
+    except Exception as e:
+        logger.error(f"Error generating data quality report: {e}")
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "error": str(e),
+            "summary": {
+                "overall_health": "error",
+                "status_message": f"Failed to generate report: {str(e)}"
+            }
+        }
+
+
+def get_collector_status(db: Session) -> Dict[str, Any]:
+    """Get status of last odds collection"""
+    from database.models import Odds
+    from datetime import datetime
+    from sqlalchemy import func
+    
+    # Get most recent odds (excluding neutral)
+    latest_odds = db.query(Odds).filter(
+        Odds.bookmaker != "neutral"
+    ).order_by(Odds.timestamp.desc()).first()
+    
+    if not latest_odds:
+        return {
+            "last_run": None,
+            "days_ago": None,
+            "status": "never",
+            "message": "Collector never executed"
+        }
+    
+    now = datetime.utcnow()
+    last_run = latest_odds.timestamp
+    days_ago = (now - last_run).days
+    hours_ago = (now - last_run).total_seconds() / 3600
+    
+    # Determine status
+    if days_ago == 0 and hours_ago < 24:
+        status = "good"
+        message = f"Executed {int(hours_ago)} hours ago"
+    elif days_ago == 1:
+        status = "warning"
+        message = "Executed 1 day ago"
+    elif days_ago <= 3:
+        status = "warning"
+        message = f"Executed {days_ago} days ago"
+    else:
+        status = "critical"
+        message = f"Executed {days_ago} days ago - Should run daily!"
+    
+    return {
+        "last_run": last_run.isoformat(),
+        "days_ago": days_ago,
+        "hours_ago": round(hours_ago, 1),
+        "status": status,
+        "message": message
+    }
+
+
+@router.post("/collect-odds")
+async def collect_odds(background_tasks: BackgroundTasks):
+    """
+    Trigger odds collection manually.
+    Runs in background to avoid timeout.
+    """
+    from datetime import datetime
+    
+    try:
+        # Run collector in background
+        background_tasks.add_task(run_odds_collector)
+        
+        return {
+            "status": "started",
+            "message": "Odds collection started in background",
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error starting odds collector: {e}")
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+
+
+async def run_odds_collector():
+    """Background task to run odds collector"""
+    import sys
+    import os
+    
+    # Add backend to path
+    backend_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if backend_path not in sys.path:
+        sys.path.insert(0, backend_path)
+    
+    try:
+        from collectors.live_odds_collector import LiveOddsCollector
+        
+        logger.info("Starting odds collection...")
+        collector = LiveOddsCollector()
+        await collector.collect_all_leagues(markets="h2h")
+        logger.info("Odds collection completed successfully")
+        
+        # Clear cache to force refresh
+        _quality_report_cache["report"] = None
+        _quality_report_cache["timestamp"] = None
+        
+    except Exception as e:
+        logger.error(f"Error running odds collector: {e}")
+
+
+@router.post("/consolidate-teams")
+async def consolidate_teams(background_tasks: BackgroundTasks):
+    """
+    Trigger team consolidation to merge duplicates.
+    Runs in background to avoid timeout.
+    """
+    from datetime import datetime
+    
+    try:
+        # Run consolidation in background
+        background_tasks.add_task(run_team_consolidation)
+        
+        return {
+            "status": "started",
+            "message": "Team consolidation started in background",
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error starting team consolidation: {e}")
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+
+
+def run_team_consolidation():
+    """Background task to consolidate duplicate teams"""
+    import sys
+    import os
+    
+    # Add backend to path
+    backend_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, backend_path)
+    
+    try:
+        # Import and run SMART consolidation
+        from scripts.consolidate_teams_smart import consolidate_smart
+        
+        logger.info("Starting smart team consolidation...")
+        deleted = consolidate_smart()
+        logger.info(f"Team consolidation completed - {deleted} teams merged")
+        
+        # Clear cache to force refresh
+        _quality_report_cache["report"] = None
+        _quality_report_cache["timestamp"] = None
+        
+    except Exception as e:
+        logger.error(f"Error running team consolidation: {e}")
