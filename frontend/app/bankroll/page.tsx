@@ -5,8 +5,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, LineChart, Line, XAx
 
 interface Match {
     id: number;
-    home_team: string;
-    away_team: string;
+    home_team: { name: string } | string;
+    away_team: { name: string } | string;
     date: string;
     round: string;
 }
@@ -374,7 +374,9 @@ export default function BankrollPage() {
                                         <td className="p-4 text-sm font-medium text-white">
                                             {bet.match ? (
                                                 <div className="flex flex-col">
-                                                    <span>{bet.match.home_team} vs {bet.match.away_team}</span>
+                                                    <span>
+                                                        {(typeof bet.match.home_team === 'object' ? bet.match.home_team.name : bet.match.home_team)} vs {(typeof bet.match.away_team === 'object' ? bet.match.away_team.name : bet.match.away_team)}
+                                                    </span>
                                                     <span className="text-xs text-gray-500">{bet.match.round}</span>
                                                 </div>
                                             ) : (

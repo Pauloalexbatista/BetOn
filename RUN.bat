@@ -4,7 +4,7 @@ echo    BetOn - Sistema de Apostas
 echo ========================================
 echo.
 echo [1/3] Iniciando Docker containers...
-docker-compose up -d
+docker-compose up -d --build
 
 echo.
 echo [2/3] Aguardando servicos iniciarem...

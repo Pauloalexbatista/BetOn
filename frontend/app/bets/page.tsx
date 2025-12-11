@@ -10,8 +10,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, LineChart, Line, XAx
 
 interface Match {
     id: number;
-    home_team: string;
-    away_team: string;
+    home_team: { name: string } | string;
+    away_team: { name: string } | string;
     date: string;
     round: string;
 }
@@ -227,10 +227,7 @@ export default function BetsPage() {
                 <div className="bg-slate-900 rounded-xl border border-slate-800 shadow-lg overflow-hidden">
                     <div className="p-6 border-b border-slate-800 flex justify-between items-center">
                         <h2 className="text-xl font-bold text-white">Histórico de Apostas</h2>
-                        <UniversalFilter
-                            onFilterChange={() => { }} // Placeholder, controlled by URL
-                            initialFilters={{}}
-                        />
+                        <UniversalFilter />
                     </div>
 
                     <div className="overflow-x-auto">
@@ -262,7 +259,9 @@ export default function BetsPage() {
                                             <td className="px-6 py-4">
                                                 {bet.match ? (
                                                     <div className="flex flex-col">
-                                                        <span className="text-white font-medium text-sm">{bet.match.home_team} vs {bet.match.away_team}</span>
+                                                        <span className="text-white font-medium text-sm">
+                                                            {(typeof bet.match.home_team === 'object' ? bet.match.home_team.name : bet.match.home_team)} vs {(typeof bet.match.away_team === 'object' ? bet.match.away_team.name : bet.match.away_team)}
+                                                        </span>
                                                         <span className="text-slate-500 text-xs">{bet.match.round}</span>
                                                     </div>
                                                 ) : (
@@ -277,14 +276,14 @@ export default function BetsPage() {
                                             <td className="px-6 py-4 text-slate-300">€{bet.stake}</td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${bet.status === 'won' ? 'bg-green-500/20 text-green-400' :
-                                                        bet.status === 'lost' ? 'bg-red-500/20 text-red-400' :
-                                                            'bg-yellow-500/20 text-yellow-400'
+                                                    bet.status === 'lost' ? 'bg-red-500/20 text-red-400' :
+                                                        'bg-yellow-500/20 text-yellow-400'
                                                     }`}>
                                                     {bet.status}
                                                 </span>
                                             </td>
                                             <td className={`px-6 py-4 font-bold ${(bet.profit_loss || 0) > 0 ? 'text-green-500' :
-                                                    (bet.profit_loss || 0) < 0 ? 'text-red-500' : 'text-slate-500'
+                                                (bet.profit_loss || 0) < 0 ? 'text-red-500' : 'text-slate-500'
                                                 }`}>
                                                 {bet.profit_loss ? `€${bet.profit_loss}` : '-'}
                                             </td>

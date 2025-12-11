@@ -22,12 +22,19 @@ class BetCreate(BaseModel):
     is_paper_trade: bool = True
 
 
+class TeamResponse(BaseModel):
+    name: str
+    
+    class Config:
+        from_attributes = True
+
+
 class MatchResponse(BaseModel):
     id: int
-    home_team: str
-    away_team: str
-    date: datetime
-    round: str
+    home_team: TeamResponse
+    away_team: TeamResponse
+    match_date: datetime
+    round: str | None = None
     
     class Config:
         from_attributes = True
