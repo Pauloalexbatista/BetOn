@@ -226,6 +226,8 @@ const WORLD_CUP_CALENDAR_DATA = [
 
 
 export default function Dashboard() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
+
   // Estados para a Consola Martingale Inteligente
   const [banca, setBanca] = useState<number>(100);
   const [odd, setOdd] = useState<number>(2.0);
@@ -339,7 +341,7 @@ export default function Dashboard() {
   const fetchMartingale = async () => {
     setLoadingMartingale(true);
     try {
-      const res = await fetch("http://localhost:8001/api/calculators/martingale", {
+      const res = await fetch(`${API_URL}/api/calculators/martingale`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -386,7 +388,7 @@ export default function Dashboard() {
 
   // Carregar partidas e apostas reais do SQLite
   useEffect(() => {
-    fetch("http://localhost:8001/api/matches")
+    fetch(`${API_URL}/api/matches`)
       .then(res => res.json())
       .then(data => {
         if (data && data.length > 0) {
@@ -408,7 +410,7 @@ export default function Dashboard() {
       })
       .catch(() => setMatches(REAL_WORLD_CUP_MATCHES));
 
-    fetch("http://localhost:8001/api/bets")
+    fetch(`${API_URL}/api/bets`)
       .then(res => res.json())
       .then(data => setSimulatedBets(data));
   }, []);
@@ -422,7 +424,7 @@ export default function Dashboard() {
       stake: stake,
       odd_taken: oddVal
     };
-    const res = await fetch("http://localhost:8001/api/bets", {
+    const res = await fetch(`${API_URL}/api/bets`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(betData)
@@ -437,7 +439,7 @@ export default function Dashboard() {
   // Resolver aposta (Atualizada no SQLite)
   const resolveBet = async (id: number, won: boolean, stake: number, oddVal: number) => {
     const status = won ? "Ganha" : "Perdida";
-    const res = await fetch(`http://localhost:8001/api/bets/${id}?status=${status}`, { method: "PUT" });
+    const res = await fetch(`${API_URL}/api/bets/${id}?status=${status}`, { method: "PUT" });
     if (res.ok) {
       setSimulatedBets(prev => prev.map(bet => bet.id === id ? { ...bet, status } : bet));
       if (won) {
