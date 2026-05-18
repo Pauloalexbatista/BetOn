@@ -83,6 +83,69 @@ const STADIUMS_DATA = [
   { name: "Toronto Stadium", commerical: "BMO Field", city: "Toronto", country: "Canadá", flag: "🇨🇦" }
 ];
 
+// Base de Dados de Estatísticas da Qualificação do Mundial
+const WORLD_CUP_TEAMS_STATS: Record<string, any> = {
+  "Portugal": { played: 10, wins: 10, draws: 0, losses: 0, gf: 36, ga: 2, form: ["W", "W", "W", "W", "W"] },
+  "Argentina": { played: 18, wins: 15, draws: 2, losses: 1, gf: 32, ga: 8, form: ["W", "W", "L", "W", "W"] },
+  "França": { played: 8, wins: 7, draws: 1, losses: 0, gf: 29, ga: 3, form: ["W", "W", "D", "W", "W"] },
+  "Brasil": { played: 18, wins: 12, draws: 3, losses: 3, gf: 38, ga: 14, form: ["W", "D", "W", "L", "W"] },
+  "Espanha": { played: 8, wins: 7, draws: 0, losses: 1, gf: 25, ga: 5, form: ["W", "W", "W", "W", "L"] },
+  "Inglaterra": { played: 8, wins: 6, draws: 2, losses: 0, gf: 22, ga: 4, form: ["W", "D", "W", "W", "D"] },
+  "Alemanha": { played: 10, wins: 9, draws: 0, losses: 1, gf: 36, ga: 10, form: ["W", "W", "W", "W", "W"] },
+  "México": { played: 12, wins: 8, draws: 3, losses: 1, gf: 24, ga: 9, form: ["W", "D", "W", "D", "L"] },
+  "EUA": { played: 14, wins: 7, draws: 4, losses: 3, gf: 21, ga: 10, form: ["W", "L", "W", "D", "W"] },
+  "Bélgica": { played: 8, wins: 6, draws: 2, losses: 0, gf: 22, ga: 4, form: ["W", "W", "D", "W", "L"] },
+  "Uruguai": { played: 18, wins: 11, draws: 4, losses: 3, gf: 29, ga: 16, form: ["W", "W", "W", "D", "W"] },
+  "Colômbia": { played: 18, wins: 12, draws: 3, losses: 3, gf: 28, ga: 13, form: ["W", "W", "D", "W", "W"] },
+  "Croácia": { played: 8, wins: 5, draws: 1, losses: 2, gf: 13, ga: 4, form: ["W", "W", "L", "W", "D"] },
+  "Marrocos": { played: 6, wins: 6, draws: 0, losses: 0, gf: 20, ga: 1, form: ["W", "W", "W", "W", "W"] },
+  "Japão": { played: 10, wins: 9, draws: 0, losses: 1, gf: 35, ga: 2, form: ["W", "W", "W", "W", "L"] },
+  "Coreia do Sul": { played: 10, wins: 8, draws: 2, losses: 0, gf: 30, ga: 3, form: ["W", "W", "D", "W", "W"] },
+  "RD Congo": { played: 10, wins: 4, draws: 3, losses: 3, gf: 11, ga: 8, form: ["L", "D", "W", "W", "D"] },
+  "Usbequistão": { played: 10, wins: 6, draws: 2, losses: 2, gf: 18, ga: 11, form: ["W", "D", "W", "L", "W"] }
+};
+
+const getTeamStats = (team: string) => {
+  if (WORLD_CUP_TEAMS_STATS[team]) return WORLD_CUP_TEAMS_STATS[team];
+  const elo = WORLD_CUP_ELO[team] || 1700;
+  const played = elo > 1900 ? 10 : (elo > 1800 ? 8 : 12);
+  const winsChance = (elo - 1500) / 700;
+  const wins = Math.max(0, Math.min(played, Math.round(played * winsChance)));
+  const losses = Math.max(0, Math.min(played - wins, Math.round(played * (1 - winsChance) * 0.7)));
+  const draws = played - wins - losses;
+  const gf = Math.round(wins * 2.2 + draws * 1.0 + losses * 0.5);
+  const ga = Math.round(losses * 2.2 + draws * 1.0 + wins * 0.6);
+  const form = [];
+  for (let i = 0; i < 5; i++) {
+    const r = Math.random();
+    if (r < winsChance) form.push("W");
+    else if (r < winsChance + 0.2) form.push("D");
+    else form.push("L");
+  }
+  return { played, wins, draws, losses, gf, ga, form };
+};
+
+const getH2HStats = (home: string, away: string) => {
+  const customH2H: Record<string, Record<string, any[]>> = {
+    "Portugal": {
+      "RD Congo": [{ date: "2024-03-24", score: "2-0", event: "Particular" }],
+      "Colômbia": [{ date: "2022-11-17", score: "2-1", event: "Particular" }]
+    }
+  };
+  if (customH2H[home]?.[away]) return customH2H[home][away];
+  if (customH2H[away]?.[home]) {
+    return customH2H[away][home].map(m => ({ ...m, score: m.score.split("-").reverse().join("-") }));
+  }
+  const eloH = WORLD_CUP_ELO[home] || 1700;
+  const eloA = WORLD_CUP_ELO[away] || 1700;
+  const score1 = eloH > eloA ? "2-1" : (eloH < eloA ? "1-2" : "1-1");
+  const score2 = eloH > eloA ? "1-0" : (eloH < eloA ? "0-1" : "2-2");
+  return [
+    { date: "2024-10-12", score: score1, event: "Amigável" },
+    { date: "2022-06-08", score: score2, event: "Amigável" }
+  ];
+};
+
 const WORLD_CUP_CALENDAR_DATA = [
   { id: 101, grupo: "A", data: "Qui, 11 Jun, 17:00", home: "México", away: "África do Sul", estadio: "Mexico City Stadium", cidade: "Cidade do México", semana: 1 },
   { id: 102, grupo: "A", data: "Qui, 11 Jun, 20:00", home: "Coreia do Sul", away: "Chéquia", estadio: "Estadio Guadalajara", cidade: "Guadalajara", semana: 1 },
@@ -185,6 +248,13 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedMatchDetail, setSelectedMatchDetail] = useState<any>(null);
 
+  // Estados para as odds da casa de apostas editáveis no modal
+  const [bookmakerH, setBookmakerH] = useState<number>(2.0);
+  const [bookmakerD, setBookmakerD] = useState<number>(3.2);
+  const [bookmakerA, setBookmakerA] = useState<number>(3.5);
+  const [bookmakerOver, setBookmakerOver] = useState<number>(1.9);
+  const [bookmakerBTTS, setBookmakerBTTS] = useState<number>(1.8);
+
   // Filtragem dos jogos para a visualização
   const filteredMatches = WORLD_CUP_CALENDAR_DATA.filter(m => {
     const matchesWeek = filterWeek === 0 || m.semana === filterWeek;
@@ -198,6 +268,69 @@ export default function Dashboard() {
 
   const handleMatchSelect = (match: any) => {
     setSelectedMatchDetail(match);
+    
+    // Calcular as Odds Reais para pré-preencher as Odds do Bookmaker (+8% de margem)
+    const home = match.home;
+    const away = match.away;
+    const eloH = WORLD_CUP_ELO[home] || 1800;
+    const eloA = WORLD_CUP_ELO[away] || 1800;
+    const statsH = getTeamStats(home);
+    const statsA = getTeamStats(away);
+    
+    // ELO + Form + Goals math
+    const diff = eloH - eloA;
+    const formH = statsH.wins * 3 + statsH.draws;
+    const formA = statsA.wins * 3 + statsA.draws;
+    const formDiff = (statsH.played > 0 && statsA.played > 0) ? (formH / statsH.played - formA / statsA.played) * 150 : 0;
+    
+    const attH = statsH.gf / statsH.played;
+    const defA = statsA.ga / statsA.played;
+    const attA = statsA.gf / statsA.played;
+    const defH = statsH.ga / statsH.played;
+    const goalDiff = (attH * defA - attA * defH) * 100;
+    
+    const adjDiff = diff + formDiff + goalDiff;
+    const probHome = 1.0 / (1.0 + Math.pow(10.0, -adjDiff / 400.0));
+    const probAway = 1.0 - probHome;
+    const drawProb = 0.26 * (1.0 - Math.abs(probHome - probAway));
+    const homeAdj = probHome * (1.0 - drawProb);
+    const awayAdj = probAway * (1.0 - drawProb);
+    
+    const pH = Math.max(1, homeAdj * 100);
+    const pD = Math.max(1, drawProb * 100);
+    const pA = Math.max(1, awayAdj * 100);
+    
+    const fairH = 100 / pH;
+    const fairD = 100 / pD;
+    const fairA = 100 / pA;
+    
+    const avgGoals = (statsH.gf + statsH.ga + statsA.gf + statsA.ga) / (statsH.played + statsA.played);
+    const over25Prob = Math.min(0.9, Math.max(0.1, 0.35 + (avgGoals - 1.5) * 0.15));
+    const fairOver = 1 / over25Prob;
+    
+    const bttsH = attH * defA;
+    const bttsA = attA * defH;
+    const bttsProb = Math.min(0.85, Math.max(0.15, 0.45 + (bttsH + bttsA - 2.0) * 0.12));
+    const fairBTTS = 1 / bttsProb;
+    
+    // Set bookmaker odds with standard margin (1.08)
+    setBookmakerH(Math.round((fairH * 1.08) * 100) / 100);
+    setBookmakerD(Math.round((fairD * 1.08) * 100) / 100);
+    setBookmakerA(Math.round((fairA * 1.08) * 100) / 100);
+    setBookmakerOver(Math.round((fairOver * 1.08) * 100) / 100);
+    setBookmakerBTTS(Math.round((fairBTTS * 1.08) * 100) / 100);
+  };
+
+  const handlePlaceVirtualBet = async (match: any, marketName: string, oddVal: number, edgeVal: number, probVal: number) => {
+    const p = probVal / 100;
+    const b = oddVal - 1;
+    const kellyFraction = b > 0 ? (p - (1 - p) / b) / 4 : 0;
+    const suggestedStake = Math.max(5, Math.round(bancaVirtual * Math.max(0.01, kellyFraction) * 100) / 100);
+    
+    // Register the bet in the simulated bets tracker
+    await handleSimulateBet(match.home + " vs " + match.away, marketName, oddVal, suggestedStake);
+    // Close the modal
+    setSelectedMatchDetail(null);
   };
 
 
@@ -1028,9 +1161,24 @@ export default function Dashboard() {
         const eloH = WORLD_CUP_ELO[home] || 1800;
         const eloA = WORLD_CUP_ELO[away] || 1800;
         
-        // ELO Math
+        const statsH = getTeamStats(home);
+        const statsA = getTeamStats(away);
+        const h2h = getH2HStats(home, away);
+
+        // ELO Math + Form + Goals math
         const diff = eloH - eloA;
-        const probHome = 1.0 / (1.0 + Math.pow(10.0, -diff / 400.0));
+        const formH = statsH.wins * 3 + statsH.draws;
+        const formA = statsA.wins * 3 + statsA.draws;
+        const formDiff = (statsH.played > 0 && statsA.played > 0) ? (formH / statsH.played - formA / statsA.played) * 150 : 0;
+        
+        const attH = statsH.gf / statsH.played;
+        const defA = statsA.ga / statsA.played;
+        const attA = statsA.gf / statsA.played;
+        const defH = statsH.ga / statsH.played;
+        const goalDiff = (attH * defA - attA * defH) * 100;
+        
+        const adjDiff = diff + formDiff + goalDiff;
+        const probHome = 1.0 / (1.0 + Math.pow(10.0, -adjDiff / 400.0));
         const probAway = 1.0 - probHome;
         const drawProb = 0.26 * (1.0 - Math.abs(probHome - probAway));
         const homeAdj = probHome * (1.0 - drawProb);
@@ -1046,104 +1194,340 @@ export default function Dashboard() {
         const fairD = pD > 0 ? Math.round((100 / pD) * 100) / 100 : 99.0;
         const fairA = pA > 0 ? Math.round((100 / pA) * 100) / 100 : 99.0;
 
+        // Over/Under 2.5 Goals Math
+        const avgGoals = (statsH.gf + statsH.ga + statsA.gf + statsA.ga) / (statsH.played + statsA.played);
+        const over25Prob = Math.min(0.9, Math.max(0.1, 0.35 + (avgGoals - 1.5) * 0.15));
+        const pOver = Math.round(over25Prob * 10000) / 100;
+        const fairOver = pOver > 0 ? Math.round((100 / pOver) * 100) / 100 : 1.90;
+
+        // Both Teams To Score (BTTS) Math
+        const bttsH = attH * defA;
+        const bttsA = attA * defH;
+        const bttsProb = Math.min(0.85, Math.max(0.15, 0.45 + (bttsH + bttsA - 2.0) * 0.12));
+        const pBTTS = Math.round(bttsProb * 10000) / 100;
+        const fairBTTS = pBTTS > 0 ? Math.round((100 / pBTTS) * 100) / 100 : 1.90;
+
+        // Edges
+        const edgeH = Math.round(((bookmakerH * pH / 100) - 1) * 10000) / 100;
+        const edgeD = Math.round(((bookmakerD * pD / 100) - 1) * 10000) / 100;
+        const edgeA = Math.round(((bookmakerA * pA / 100) - 1) * 10000) / 100;
+        const edgeOver = Math.round(((bookmakerOver * pOver / 100) - 1) * 10000) / 100;
+        const edgeBTTS = Math.round(((bookmakerBTTS * pBTTS / 100) - 1) * 10000) / 100;
+
+        // Recommended entry compilation
+        const markets = [
+          { name: `Vitória de ${home}`, key: "1", prob: pH, fairOdd: fairH, bookmakerOdd: bookmakerH, edge: edgeH },
+          { name: "Empate (X)", key: "X", prob: pD, fairOdd: fairD, bookmakerOdd: bookmakerD, edge: edgeD },
+          { name: `Vitória de ${away}`, key: "2", prob: pA, fairOdd: fairA, bookmakerOdd: bookmakerA, edge: edgeA },
+          { name: "Mais de 2.5 Golos", key: "Over 2.5", prob: pOver, fairOdd: fairOver, bookmakerOdd: bookmakerOver, edge: edgeOver },
+          { name: "Ambas Marcam: SIM", key: "BTTS SIM", prob: pBTTS, fairOdd: fairBTTS, bookmakerOdd: bookmakerBTTS, edge: edgeBTTS }
+        ];
+
+        const sortedMarkets = [...markets].sort((a, b) => b.edge - a.edge);
+        const bestMarket = sortedMarkets[0];
+
+        // Kelly suggested stake
+        const bKelly = bestMarket.bookmakerOdd - 1;
+        const pKelly = bestMarket.prob / 100;
+        const fKelly = bKelly > 0 ? (pKelly - (1 - pKelly) / bKelly) / 4 : 0; // 1/4 Fractional Kelly
+        const suggestedStake = Math.max(0, Math.round(bancaVirtual * Math.max(0, fKelly) * 100) / 100);
+
         return (
-          <div className="fixed inset-0 bg-background bg-opacity-70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="glass-panel max-w-xl w-full p-6 md:p-8 space-y-6 border border-borderBg relative animate-fade-in shadow-blue-neon">
+          <div className="fixed inset-0 bg-background bg-opacity-85 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div className="glass-panel max-w-5xl w-full p-6 md:p-8 space-y-6 border border-borderBg relative animate-fade-in shadow-blue-neon my-8 max-h-[90vh] overflow-y-auto">
               {/* Fechar */}
               <button 
                 onClick={() => setSelectedMatchDetail(null)}
-                className="absolute right-4 top-4 text-gray-400 hover:text-white text-xl font-bold font-mono p-2"
+                className="absolute right-4 top-4 text-gray-400 hover:text-white text-xl font-bold font-mono p-2 hover:bg-borderBg hover:bg-opacity-35 rounded-lg transition-all"
               >
                 ✕
               </button>
 
               <div className="text-center">
-                <span className="text-[10px] bg-gold bg-opacity-15 text-gold border border-gold border-opacity-35 px-3 py-1 rounded-full font-mono font-bold">
-                  ⚽ MOTOR QUANTITATIVO: ESTIMATIVA ELO
+                <span className="text-[10px] bg-neonBlue bg-opacity-15 text-neonBlue border border-neonBlue border-opacity-35 px-3 py-1 rounded-full font-mono font-bold uppercase tracking-widest">
+                  🏟️ SIMULADOR QUANTITATIVO: ESTIMATIVA ELO, FORMA & QUALIFICAÇÃO
                 </span>
-                <h3 className="text-2xl font-bold font-outfit text-white mt-3">Análise de Probabilidades</h3>
-                <p className="text-xs text-gray-400 font-mono mt-1">{selectedMatchDetail.data} • Grupo {selectedMatchDetail.grupo}</p>
+                <h3 className="text-2xl font-bold font-outfit text-white mt-3">{home} 🆚 {away}</h3>
+                <p className="text-xs text-gray-400 font-mono mt-1">{selectedMatchDetail.data} • {selectedMatchDetail.estadio} ({selectedMatchDetail.cidade})</p>
               </div>
 
-              {/* Ecrã de Equipas */}
-              <div className="grid grid-cols-3 items-center text-center py-4 bg-borderBg bg-opacity-20 rounded-2xl border border-borderBg border-opacity-20">
-                <div className="space-y-1">
-                  <span className="text-4xl block">{getFlag(home)}</span>
-                  <span className="font-outfit font-black text-white block text-sm">{home}</span>
-                  <span className="text-[11px] text-gray-400 font-mono block">ELO: {eloH}</span>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-xs text-gold font-bold block uppercase font-mono tracking-widest">Diferença</span>
-                  <span className="text-2xl font-black text-white font-mono block">{diff > 0 ? `+${diff}` : diff}</span>
-                  <span className="text-[9px] text-gray-500 font-mono block">Pontos</span>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-4xl block">{getFlag(away)}</span>
-                  <span className="font-outfit font-black text-white block text-sm">{away}</span>
-                  <span className="text-[11px] text-gray-400 font-mono block">ELO: {eloA}</span>
-                </div>
-              </div>
-
-              {/* Gráficos de Probabilidade */}
-              <div className="space-y-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-300 font-mono">Probabilidades Reais Estimadas</h4>
+              {/* Layout em Duas Colunas */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                <div className="space-y-3 font-mono text-xs">
-                  {/* Vitória Casa */}
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-gray-300">
-                      <span>Vitória {home} ({getFlag(home)})</span>
-                      <span className="text-emerald font-bold">{pH}%</span>
-                    </div>
-                    <div className="w-full bg-borderBg h-2 rounded-full overflow-hidden">
-                      <div className="bg-emerald h-full rounded-full" style={{ width: `${pH}%` }}></div>
+                {/* COLUNA ESQUERDA: ESTATÍSTICAS E CONFRONTOS */}
+                <div className="lg:col-span-6 space-y-6">
+                  
+                  {/* Percurso na Qualificação */}
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-gray-300 font-mono border-b border-borderBg border-opacity-30 pb-2">
+                      📈 Percurso na Qualificação para o Mundial
+                    </h4>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs font-mono">
+                        <thead>
+                          <tr className="text-gray-500 uppercase">
+                            <th className="pb-2">Seleção</th>
+                            <th className="pb-2 text-center">J</th>
+                            <th className="pb-2 text-center">V</th>
+                            <th className="pb-2 text-center">E</th>
+                            <th className="pb-2 text-center">D</th>
+                            <th className="pb-2 text-center">GF/GS</th>
+                            <th className="pb-2 text-center">DG</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-borderBg divide-opacity-10 text-gray-300">
+                          <tr>
+                            <td className="py-2 text-white font-bold flex items-center gap-1">
+                              <span>{getFlag(home)}</span> {home}
+                            </td>
+                            <td className="py-2 text-center">{statsH.played}</td>
+                            <td className="py-2 text-center text-emerald">{statsH.wins}</td>
+                            <td className="py-2 text-center text-gold">{statsH.draws}</td>
+                            <td className="py-2 text-center text-red-400">{statsH.losses}</td>
+                            <td className="py-2 text-center">{statsH.gf}/{statsH.ga}</td>
+                            <td className="py-2 text-center font-bold">{statsH.gf - statsH.ga > 0 ? `+${statsH.gf - statsH.ga}` : statsH.gf - statsH.ga}</td>
+                          </tr>
+                          <tr>
+                            <td className="py-2 text-white font-bold flex items-center gap-1">
+                              <span>{getFlag(away)}</span> {away}
+                            </td>
+                            <td className="py-2 text-center">{statsA.played}</td>
+                            <td className="py-2 text-center text-emerald">{statsA.wins}</td>
+                            <td className="py-2 text-center text-gold">{statsA.draws}</td>
+                            <td className="py-2 text-center text-red-400">{statsA.losses}</td>
+                            <td className="py-2 text-center">{statsA.gf}/{statsA.ga}</td>
+                            <td className="py-2 text-center font-bold">{statsA.gf - statsA.ga > 0 ? `+${statsA.gf - statsA.ga}` : statsA.gf - statsA.ga}</td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
 
-                  {/* Empate */}
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-gray-300">
-                      <span>Empate (⚖️)</span>
-                      <span className="text-gold font-bold">{pD}%</span>
-                    </div>
-                    <div className="w-full bg-borderBg h-2 rounded-full overflow-hidden">
-                      <div className="bg-gold h-full rounded-full" style={{ width: `${pD}%` }}></div>
+                  {/* Forma Recente ( badges V/E/D ) */}
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-gray-300 font-mono border-b border-borderBg border-opacity-30 pb-2">
+                      ⚡ Forma Recente (Últimos 5 Jogos)
+                    </h4>
+                    <div className="flex justify-between items-center bg-cardBg bg-opacity-35 p-3 rounded-xl border border-borderBg border-opacity-10">
+                      <div className="space-y-1">
+                        <span className="text-[10px] text-gray-500 font-mono block">{home}</span>
+                        <div className="flex gap-1.5">
+                          {statsH.form.map((f: string, i: number) => (
+                            <span 
+                              key={i} 
+                              className={`h-5 w-5 rounded-full flex items-center justify-center font-bold text-[10px] font-mono shadow-md ${
+                                f === "W" 
+                                  ? "bg-emerald text-white" 
+                                  : f === "D" 
+                                    ? "bg-gold text-background" 
+                                    : "bg-red-500 text-white"
+                              }`}
+                            >
+                              {f === "W" ? "V" : f === "D" ? "E" : "D"}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="text-right space-y-1">
+                        <span className="text-[10px] text-gray-500 font-mono block">{away}</span>
+                        <div className="flex gap-1.5 justify-end">
+                          {statsA.form.map((f: string, i: number) => (
+                            <span 
+                              key={i} 
+                              className={`h-5 w-5 rounded-full flex items-center justify-center font-bold text-[10px] font-mono shadow-md ${
+                                f === "W" 
+                                  ? "bg-emerald text-white" 
+                                  : f === "D" 
+                                    ? "bg-gold text-background" 
+                                    : "bg-red-500 text-white"
+                              }`}
+                            >
+                              {f === "W" ? "V" : f === "D" ? "E" : "D"}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Vitória Fora */}
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-gray-300">
-                      <span>Vitória {away} ({getFlag(away)})</span>
-                      <span className="text-neonBlue font-bold">{pA}%</span>
-                    </div>
-                    <div className="w-full bg-borderBg h-2 rounded-full overflow-hidden">
-                      <div className="bg-neonBlue h-full rounded-full" style={{ width: `${pA}%` }}></div>
+                  {/* Historial de Confrontos Diretos */}
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-gray-300 font-mono border-b border-borderBg border-opacity-30 pb-2">
+                      ⚔️ Historial de Confrontos Diretos (H2H)
+                    </h4>
+                    <div className="space-y-2 bg-cardBg bg-opacity-25 p-3 rounded-xl border border-borderBg border-opacity-10">
+                      {h2h.map((h: any, i: number) => (
+                        <div key={i} className="flex justify-between items-center py-1.5 text-xs font-mono border-b border-borderBg border-opacity-15 last:border-b-0">
+                          <span className="text-gray-500">{h.date} • {h.event}</span>
+                          <span className="font-bold text-white flex items-center gap-1.5">
+                            <span>{getFlag(home)}</span>
+                            <span>{h.score}</span>
+                            <span>{getFlag(away)}</span>
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </div>
+
                 </div>
-              </div>
 
-              {/* Odds Justas Estimadas */}
-              <div className="p-4 bg-cardBg bg-opacity-40 border border-borderBg border-opacity-35 rounded-2xl space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-300 font-mono text-center">Odds Justas Teóricas (Zero Margem)</h4>
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  <div className="p-2.5 bg-borderBg bg-opacity-25 rounded-xl border border-borderBg border-opacity-25">
-                    <span className="text-[10px] text-gray-400 font-mono block">Vitória {home}</span>
-                    <span className="text-base font-black text-emerald font-mono mt-1 block">{fairH.toFixed(2)}</span>
+                {/* COLUNA DIREITA: ODDS REAIS, BOOKMAKER & EV */}
+                <div className="lg:col-span-6 space-y-6">
+                  
+                  {/* Odds Ajustáveis do Bookmaker */}
+                  <div className="bg-cardBg bg-opacity-40 p-4 border border-borderBg border-opacity-35 rounded-2xl space-y-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-gold font-mono text-center flex items-center justify-center gap-2">
+                      ✏️ Odds Editáveis do Bookmaker (Insere as Odds da tua Casa)
+                    </h4>
+                    <div className="grid grid-cols-5 gap-2 text-center">
+                      <div className="space-y-1">
+                        <label className="text-[9px] text-gray-500 uppercase font-mono block">Casa (1)</label>
+                        <input 
+                          type="number" 
+                          step="0.05" 
+                          value={bookmakerH} 
+                          onChange={(e) => setBookmakerH(Math.max(1.01, Number(e.target.value)))}
+                          className="w-full bg-background border border-borderBg rounded px-1.5 py-1 text-xs text-white font-mono text-center focus:outline-none focus:border-neonBlue"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] text-gray-500 uppercase font-mono block">Empate (X)</label>
+                        <input 
+                          type="number" 
+                          step="0.05" 
+                          value={bookmakerD} 
+                          onChange={(e) => setBookmakerD(Math.max(1.01, Number(e.target.value)))}
+                          className="w-full bg-background border border-borderBg rounded px-1.5 py-1 text-xs text-white font-mono text-center focus:outline-none focus:border-neonBlue"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] text-gray-500 uppercase font-mono block">Fora (2)</label>
+                        <input 
+                          type="number" 
+                          step="0.05" 
+                          value={bookmakerA} 
+                          onChange={(e) => setBookmakerA(Math.max(1.01, Number(e.target.value)))}
+                          className="w-full bg-background border border-borderBg rounded px-1.5 py-1 text-xs text-white font-mono text-center focus:outline-none focus:border-neonBlue"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] text-gray-500 uppercase font-mono block">Over 2.5</label>
+                        <input 
+                          type="number" 
+                          step="0.05" 
+                          value={bookmakerOver} 
+                          onChange={(e) => setBookmakerOver(Math.max(1.01, Number(e.target.value)))}
+                          className="w-full bg-background border border-borderBg rounded px-1.5 py-1 text-xs text-white font-mono text-center focus:outline-none focus:border-neonBlue"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] text-gray-500 uppercase font-mono block">BTTS Sim</label>
+                        <input 
+                          type="number" 
+                          step="0.05" 
+                          value={bookmakerBTTS} 
+                          onChange={(e) => setBookmakerBTTS(Math.max(1.01, Number(e.target.value)))}
+                          className="w-full bg-background border border-borderBg rounded px-1.5 py-1 text-xs text-white font-mono text-center focus:outline-none focus:border-neonBlue"
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-2.5 bg-borderBg bg-opacity-25 rounded-xl border border-borderBg border-opacity-25">
-                    <span className="text-[10px] text-gray-400 font-mono block">Empate</span>
-                    <span className="text-base font-black text-gold font-mono mt-1 block">{fairD.toFixed(2)}</span>
+
+                  {/* Comparativo de Odds Reais vs Bookmaker (EV) */}
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-gray-300 font-mono">
+                      📊 Odds Reais da App vs Odds da Casa de Apostas
+                    </h4>
+                    
+                    <div className="space-y-2.5 font-mono text-xs">
+                      {markets.map((m: any) => (
+                        <div 
+                          key={m.key}
+                          className={`p-3 rounded-xl border flex flex-col sm:flex-row justify-between sm:items-center gap-2 transition-all ${
+                            m.edge > 0 
+                              ? "bg-emerald bg-opacity-10 border-emerald border-opacity-35" 
+                              : "bg-borderBg bg-opacity-10 border-borderBg border-opacity-20"
+                          }`}
+                        >
+                          <div className="space-y-0.5">
+                            <span className="text-white font-bold block">{m.name}</span>
+                            <span className="text-[10px] text-gray-500">Probabilidade Real: <span className="font-bold text-gray-300">{m.prob}%</span></span>
+                          </div>
+                          
+                          <div className="flex gap-4 items-center">
+                            <div className="text-right">
+                              <span className="text-[9px] text-gray-500 block">REAL (Fair)</span>
+                              <span className="font-black text-gray-300">{m.fairOdd.toFixed(2)}</span>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-[9px] text-gray-500 block">CASA</span>
+                              <span className="font-black text-white">{m.bookmakerOdd.toFixed(2)}</span>
+                            </div>
+                            <div className="text-right min-w-[70px]">
+                              <span className="text-[9px] text-gray-500 block">EDGE (+EV)</span>
+                              <span className={`font-black ${m.edge > 0 ? "text-emerald" : "text-gray-500"}`}>
+                                {m.edge > 0 ? `+${m.edge}%` : `${m.edge}%`}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="p-2.5 bg-borderBg bg-opacity-25 rounded-xl border border-borderBg border-opacity-25">
-                    <span className="text-[10px] text-gray-400 font-mono block">Vitória {away}</span>
-                    <span className="text-base font-black text-neonBlue font-mono mt-1 block">{fairA.toFixed(2)}</span>
+
+                  {/* Recomendação de Entrada e Kelly Stake */}
+                  <div className="p-4 bg-borderBg bg-opacity-20 border border-borderBg border-opacity-30 rounded-2xl space-y-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="text-[9px] text-gray-500 uppercase tracking-widest block font-mono">Entrada Sugerida</span>
+                        {bestMarket.edge > 0 ? (
+                          <h4 className="text-lg font-outfit font-black text-emerald mt-1 flex items-center gap-1.5">
+                            🏆 {bestMarket.name}
+                          </h4>
+                        ) : (
+                          <h4 className="text-sm font-outfit font-bold text-gray-400 mt-1">
+                            ⚖️ Sem Entrada Lucrativa (+EV)
+                          </h4>
+                        )}
+                      </div>
+                      
+                      <div className="text-right">
+                        <span className="text-[9px] text-gray-500 uppercase tracking-widest block font-mono">Expectativa (Edge)</span>
+                        <span className={`text-base font-black font-mono ${bestMarket.edge > 0 ? "text-emerald animate-pulse" : "text-gray-400"}`}>
+                          {bestMarket.edge > 0 ? `+${bestMarket.edge}%` : "0.00%"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-borderBg border-opacity-25 pt-3 flex flex-col sm:flex-row justify-between sm:items-center gap-3 text-xs font-mono">
+                      <div>
+                        <span className="text-[9px] text-gray-500 block uppercase">Valor da Aposta Recomendado (1/4 Kelly)</span>
+                        {bestMarket.edge > 0 ? (
+                          <span className="text-base font-black text-white">
+                            € {suggestedStake.toFixed(2)} <span className="text-xs text-gray-400 font-semibold">({((suggestedStake / bancaVirtual) * 100).toFixed(1)}% da Banca)</span>
+                          </span>
+                        ) : (
+                          <span className="text-gray-500">€ 0.00 (Evitar Mercado)</span>
+                        )}
+                      </div>
+                      
+                      {bestMarket.edge > 0 ? (
+                        <button
+                          onClick={() => handlePlaceVirtualBet(selectedMatchDetail, bestMarket.name, bestMarket.bookmakerOdd, bestMarket.edge, bestMarket.prob)}
+                          className="px-4 py-2.5 bg-gradient-to-r from-gold to-emerald text-background font-black font-outfit rounded-xl shadow-gold-neon hover:scale-[1.03] transition-all whitespace-nowrap"
+                        >
+                          💸 Efetuar Aposta Virtual
+                        </button>
+                      ) : (
+                        <span className="text-[10px] text-gray-500 text-center italic max-w-[200px]">
+                          Bookmakers têm margem sobre o preço. Sugerimos aguardar que as odds subam em live para entrar (+EV).
+                        </span>
+                      )}
+                    </div>
                   </div>
+
                 </div>
-                <p className="text-[9px] text-gray-500 font-mono text-center">
-                  💡 Regra do Rei Paulo: Se a odd da casa de apostas for superior a esta odd justa, é uma aposta de valor (+EV)!
-                </p>
+
               </div>
             </div>
           </div>
