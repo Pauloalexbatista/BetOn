@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import math
 from typing import List, Dict, Optional
+from collectors.api_football_client import APIFootballClient
+from collectors.the_odds_client import TheOddsClient
+
 
 app = FastAPI(
     title="🏛️ BetOn Backend API",
@@ -66,6 +69,19 @@ def read_root():
         "message": "Fundações do Império BetOn ativas na VPS!",
         "version": "1.0.0"
     }
+
+@app.get("/api/test/football")
+async def test_football():
+    client = APIFootballClient()
+    data = await client.get_standings(league_id=94, season=2025)
+    return {"source": "API-Football", "data": data}
+
+@app.get("/api/test/odds")
+async def test_odds():
+    client = TheOddsClient()
+    data = await client.get_odds(sport="soccer_portugal_primeira_liga")
+    return {"source": "The Odds API", "data": data}
+
 
 @app.get("/api/health")
 def health_check():
