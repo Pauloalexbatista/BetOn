@@ -5,6 +5,7 @@ import math
 from typing import List, Dict, Optional
 from collectors.api_football_client import APIFootballClient
 from collectors.the_odds_client import TheOddsClient
+from collectors.sync_engine import SyncEngine
 from database.database import init_db
 
 # Inicializa a base de dados ao arrancar
@@ -84,6 +85,16 @@ async def test_odds():
     client = TheOddsClient()
     data = await client.get_odds(sport="soccer_portugal_primeira_liga")
     return {"source": "The Odds API", "data": data}
+
+@app.post("/api/sync/data")
+async def sync_data(league_id: int = 94, season: int = 2025, sport_key: str = "soccer_portugal_primeira_liga"):
+    engine = SyncEngine()
+    return await engine.sync_data(league_id, season, sport_key)
+
+@app.get("/api/analysis/smart-money")
+async def get_smart_money():
+    engine = SyncEngine()
+    return {"alerts": engine.get_smart_money_alerts()}
 
 
 @app.get("/api/health")
