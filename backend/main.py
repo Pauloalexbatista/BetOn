@@ -113,6 +113,12 @@ def get_bets():
     db = SessionLocal()
     return db.query(SimulatedBet).all()
 
+@app.get("/api/matches")
+def get_matches():
+    from database.models import Match
+    db = SessionLocal()
+    return db.query(Match).all()
+
 @app.put("/api/bets/{bet_id}")
 def update_bet(bet_id: int, status: str):
     db = SessionLocal()
@@ -121,6 +127,7 @@ def update_bet(bet_id: int, status: str):
         bet.status = status
         db.commit()
     return bet
+
 
 
 @app.get("/api/health")

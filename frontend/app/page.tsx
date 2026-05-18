@@ -15,13 +15,16 @@ import {
   HelpCircle
 } from "lucide-react";
 
-// Mock das próximas partidas do Mundial para demonstração visual rica
-const UPCOMING_MATCHES = [
-  { id: 1, home: "Portugal", away: "França", time: "Hoje, 20:00", ELO_H: 2000, ELO_A: 2110, btts_odd: 2.05, fav_odd: 3.10 },
-  { id: 2, home: "Argentina", away: "Alemanha", time: "Amanhã, 17:00", ELO_H: 2130, ELO_A: 1910, btts_odd: 1.95, fav_odd: 1.85 },
-  { id: 3, home: "Brasil", away: "Inglaterra", time: "Quarta, 20:00", ELO_H: 2010, ELO_A: 2020, btts_odd: 2.10, fav_odd: 2.60 },
-  { id: 4, home: "Espanha", away: "Japão", time: "Quinta, 15:00", ELO_H: 2040, ELO_A: 1820, btts_odd: 2.20, fav_odd: 1.45 },
+// Partidas REAIS do Mundial de 2026 para exibição inicial e salvaguarda
+const REAL_WORLD_CUP_MATCHES = [
+  { id: 1, home: "México", away: "Coreia do Sul", time: "11 Jun, 20:00", ELO_H: 1800, ELO_A: 1760, btts_odd: 2.10, fav_odd: 1.90 },
+  { id: 2, home: "EUA", away: "Suíça", time: "12 Jun, 19:00", ELO_H: 1820, ELO_A: 1780, btts_odd: 2.20, fav_odd: 1.85 },
+  { id: 3, home: "Brasil", away: "Marrocos", time: "14 Jun, 21:00", ELO_H: 2010, ELO_A: 1880, btts_odd: 2.10, fav_odd: 1.50 },
+  { id: 4, home: "Portugal", away: "RD Congo", time: "17 Jun, 13:00", ELO_H: 1980, ELO_A: 1710, btts_odd: 2.05, fav_odd: 1.30 },
+  { id: 5, home: "Portugal", away: "Uzbequistão", time: "23 Jun, 13:00", ELO_H: 1980, ELO_A: 1760, btts_odd: 2.05, fav_odd: 1.35 },
+  { id: 6, home: "Portugal", away: "Colômbia", time: "27 Jun, 19:30", ELO_H: 1980, ELO_A: 1940, btts_odd: 1.95, fav_odd: 2.10 },
 ];
+
 
 export default function Dashboard() {
   // Estados para a Consola Martingale Inteligente
@@ -37,6 +40,8 @@ export default function Dashboard() {
   // Estado para a Banca Virtual Global
   const [bancaVirtual, setBancaVirtual] = useState<number>(1000);
   const [simulatedBets, setSimulatedBets] = useState<any[]>([]);
+  const [matches, setMatches] = useState<any[]>(REAL_WORLD_CUP_MATCHES);
+
 
   // Chamada de API para calcular o Martingale dinamicamente no backend
   const fetchMartingale = async () => {
@@ -87,12 +92,35 @@ export default function Dashboard() {
     fetchMartingale();
   }, [banca, odd, lucro]);
 
-  // Carregar apostas reais do SQLite
+  // Carregar partidas e apostas reais do SQLite
   useEffect(() => {
+    fetch("http://localhost:8001/api/matches")
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          // Mapear os campos do SQLite para o formato esperado pelo ecrã
+          const mapped = data.map((m: any) => ({
+            id: m.id,
+            home: m.home_team,
+            away: m.away_team,
+            time: m.date ? new Date(m.date).toLocaleDateString("pt-PT") + " " + new Date(m.date).toLocaleTimeString("pt-PT", {hour: "2-digit", minute: "2-digit"}) : "Brevemente",
+            ELO_H: m.home_elo || 1800,
+            ELO_A: m.away_elo || 1800,
+            btts_odd: m.home_team === "Portugal" ? 2.05 : (m.home_team === "EUA" ? 2.20 : 2.10), // Odds do simulador base
+            fav_odd: m.home_team === "Brasil" ? 1.50 : 1.90
+          }));
+          setMatches(mapped);
+        } else {
+          setMatches(REAL_WORLD_CUP_MATCHES);
+        }
+      })
+      .catch(() => setMatches(REAL_WORLD_CUP_MATCHES));
+
     fetch("http://localhost:8001/api/bets")
       .then(res => res.json())
       .then(data => setSimulatedBets(data));
   }, []);
+
 
   // Função para simular aposta (Persistida no SQLite)
   const handleSimulateBet = async (match: any, type: string, oddVal: number, stake: number) => {
@@ -315,7 +343,7 @@ export default function Dashboard() {
             <h4 className="text-sm font-bold uppercase tracking-wider text-gray-300 font-outfit">Jogos do Mundial Detetados</h4>
             
             <div className="space-y-4">
-              {UPCOMING_MATCHES.map(match => {
+              {matches.map(match => {
                 // Cálculo de valor com base na estratégia selecionada
                 let badge = "";
                 let valueLabel = "";
