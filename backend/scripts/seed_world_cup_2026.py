@@ -38,17 +38,44 @@ def seed_data():
         },
         {
             "home_team": "Portugal",
-            "away_team": "França",
-            "date": datetime(2026, 6, 15, 18, 0),
+            "away_team": "RD Congo",
+            "date": datetime(2026, 6, 17, 13, 0),
             "league_id": 1,
             "season": 2026,
             "home_elo": 1980,
-            "away_elo": 2020,
+            "away_elo": 1710,
             "home_fifa": 1740,
-            "away_fifa": 1840,
+            "away_fifa": 1540,
             "status": "SCHEDULED",
             "result": "vs"
         },
+        {
+            "home_team": "Portugal",
+            "away_team": "Uzbequistão",
+            "date": datetime(2026, 6, 23, 13, 0),
+            "league_id": 1,
+            "season": 2026,
+            "home_elo": 1980,
+            "away_elo": 1760,
+            "home_fifa": 1740,
+            "away_fifa": 1580,
+            "status": "SCHEDULED",
+            "result": "vs"
+        },
+        {
+            "home_team": "Portugal",
+            "away_team": "Colômbia",
+            "date": datetime(2026, 6, 27, 19, 30),
+            "league_id": 1,
+            "season": 2026,
+            "home_elo": 1980,
+            "away_elo": 1940,
+            "home_fifa": 1740,
+            "away_fifa": 1710,
+            "status": "SCHEDULED",
+            "result": "vs"
+        },
+
         {
             "home_team": "EUA",
             "away_team": "Suíça",
