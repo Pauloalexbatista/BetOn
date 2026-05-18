@@ -13,6 +13,8 @@ class Match(Base):
     season = Column(Integer)
     home_elo = Column(Integer)
     away_elo = Column(Integer)
+    home_fifa = Column(Integer, default=0)
+    away_fifa = Column(Integer, default=0)
     status = Column(String)
     result = Column(String)
     odds_history = relationship("OddsHistory", back_populates="match")

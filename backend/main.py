@@ -196,14 +196,24 @@ def get_match_probability(home: str, away: str):
     elo_home = WORLD_CUP_ELO[home]
     elo_away = WORLD_CUP_ELO[away]
     
-    # Diferença de ELO (sem vantagem de casa, pois o Mundial é em campo neutro)
-    diff = elo_home - elo_away
+    # Fator Atmosfera (Crowd Boost)
+    crowd_boost = 0
+    hosts = ["EUA", "Canadá", "México"]
+    crowd_favorites = ["México", "Argentina", "Brasil"]
+    
+    if home in hosts: crowd_boost += 150
+    if away in hosts: crowd_boost -= 150
+    if home in crowd_favorites: crowd_boost += 80
+    if away in crowd_favorites: crowd_boost -= 80
+    
+    # Diferença de ELO ajustada pelo Fator Atmosfera
+    diff = (elo_home - elo_away) + crowd_boost
     
     # Função logística padrão do ELO
     prob_home = 1.0 / (1.0 + math.pow(10.0, -diff / 400.0))
     prob_away = 1.0 - prob_home
     
-    # O empate no futebol em ELO reduz a probabilidade de vitória de ambos, distribuindo cerca de 26% para o Draw
+    # O empate no futebol em ELO reduz a probabilidade de vitória de ambos
     draw_prob = 0.26 * (1.0 - abs(prob_home - prob_away))
     
     home_adj = prob_home * (1.0 - draw_prob)
@@ -215,6 +225,7 @@ def get_match_probability(home: str, away: str):
         "away_team": away,
         "home_elo": elo_home,
         "away_elo": elo_away,
+        "crowd_boost_applied": crowd_boost,
         "probabilities": {
             "home_win": round(home_adj * 100, 2),
             "draw": round(draw_prob * 100, 2),
