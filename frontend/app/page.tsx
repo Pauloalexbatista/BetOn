@@ -1158,6 +1158,7 @@ export default function Dashboard() {
         )}
 
         {/* CONTEÚDO DA TAB EQUIPAS */}
+        {/* CONTEÚDO DA TAB EQUIPAS */}
         {calendarTab === "equipas" && (() => {
           // Extrai todas as seleções presentes no calendário do Mundial de forma única
           const allTeams = Array.from(new Set(
@@ -1169,6 +1170,63 @@ export default function Dashboard() {
             "Argentina": 1, "França": 2, "Espanha": 3, "Inglaterra": 4, "Brasil": 5, "Portugal": 6, "Bélgica": 7, "Países Baixos": 8, "Croácia": 10, "Uruguai": 11, "Colômbia": 12, "EUA": 13, "Alemanha": 16, "México": 15, "Japão": 18, "Senegal": 17, "Dinamarca": 21, "Coreia do Sul": 23, "África do Sul": 59, "RD Congo": 61, "Gana": 68, "Cabo Verde": 65, "Iraque": 58, "Áustria": 25, "Noruega": 47, "Usbequistão": 64, "Argélia": 43, "Panamá": 45, "Honduras": 78, "Catar": 34, "Irão": 20, "Bósnia e H.": 74, "Escócia": 39, "Austrália": 24, "Costa do Marfim": 38, "Nova Zelândia": 104, "Egito": 37, "Jordânia": 71, "Haiti": 90, "Curaçau": 91
           };
 
+          // Função auxiliar para retornar a cor da marca oficial de cada seleção (fundo do card superior)
+          const getTeamBrandColor = (team: string): string => {
+            const colors: Record<string, string> = {
+              "Argentina": "bg-sky-400 text-slate-900",
+              "França": "bg-blue-800 text-white",
+              "Espanha": "bg-red-700 text-white",
+              "Inglaterra": "bg-slate-100 text-slate-900 border-b border-gray-200",
+              "Brasil": "bg-yellow-400 text-slate-900",
+              "Portugal": "bg-red-850 text-white",
+              "Bélgica": "bg-red-600 text-white",
+              "Países Baixos": "bg-orange-500 text-white",
+              "Itália": "bg-blue-600 text-white",
+              "Alemanha": "bg-zinc-800 text-white",
+              "Uruguai": "bg-sky-400 text-slate-900",
+              "Croácia": "bg-red-600 text-white",
+              "Marrocos": "bg-red-800 text-white",
+              "Colômbia": "bg-yellow-400 text-slate-900",
+              "Japão": "bg-blue-900 text-white",
+              "EUA": "bg-blue-800 text-white",
+              "Suíça": "bg-red-600 text-white",
+              "Dinamarca": "bg-red-600 text-white",
+              "Coreia do Sul": "bg-red-700 text-white",
+              "África do Sul": "bg-yellow-400 text-slate-900",
+              "México": "bg-emerald-700 text-white",
+              "Canadá": "bg-red-600 text-white",
+              "Chéquia": "bg-blue-800 text-white",
+              "Bósnia e Herzegovina": "bg-blue-800 text-white",
+              "Bósnia e H.": "bg-blue-800 text-white",
+              "Catar": "bg-purple-900 text-white",
+              "Haiti": "bg-blue-800 text-white",
+              "Escócia": "bg-blue-900 text-white",
+              "Austrália": "bg-yellow-400 text-slate-900",
+              "Turquia": "bg-red-600 text-white",
+              "Curaçau": "bg-blue-600 text-white",
+              "Costa do Marfim": "bg-orange-500 text-white",
+              "Equador": "bg-yellow-400 text-slate-900",
+              "Suécia": "bg-yellow-400 text-slate-900",
+              "Tunísia": "bg-red-600 text-white",
+              "Arábia Saudita": "bg-emerald-700 text-white",
+              "Cabo Verde": "bg-blue-800 text-white",
+              "Irão": "bg-emerald-700 text-white",
+              "Nova Zelândia": "bg-slate-100 text-slate-900 border-b border-gray-200",
+              "Egito": "bg-red-600 text-white",
+              "Senegal": "bg-emerald-700 text-white",
+              "Iraque": "bg-emerald-700 text-white",
+              "Noruega": "bg-red-600 text-white",
+              "Argélia": "bg-emerald-600 text-white",
+              "Áustria": "bg-red-600 text-white",
+              "Jordânia": "bg-red-600 text-white",
+              "Gana": "bg-yellow-400 text-slate-900",
+              "Panamá": "bg-red-600 text-white",
+              "RD Congo": "bg-blue-500 text-white",
+              "Usbequistão": "bg-sky-400 text-slate-900"
+            };
+            return colors[team] || "bg-indigo-600 text-white";
+          };
+
           const filteredTeams = allTeams.filter(team => 
             team.toLowerCase().includes(teamSearch.toLowerCase())
           );
@@ -1176,16 +1234,16 @@ export default function Dashboard() {
           return (
             <div className="space-y-6">
               {/* Barra de Pesquisa */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-cardBg bg-opacity-30 p-4 rounded-2xl border border-borderBg border-opacity-20">
+              <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-cardBg p-5 rounded-2xl border border-borderBg border-opacity-60 shadow-sm">
                 <div className="space-y-1">
-                  <h4 className="text-sm font-bold uppercase tracking-wider text-white font-mono flex items-center gap-2">
+                  <h4 className="text-sm font-bold uppercase tracking-wider text-gray-900 font-outfit flex items-center gap-2">
                     📈 Caminhada & Rankings Mundiais das Seleções
                   </h4>
-                  <p className="text-[11px] text-gray-400 font-mono">Consulta a classificação FIFA, os pontos ELO e as estatísticas reais de qualificação de todas as equipas.</p>
+                  <p className="text-xs text-gray-500">Consulta a classificação FIFA, os pontos ELO e as estatísticas reais de qualificação de todas as equipas.</p>
                 </div>
                 
                 <div className="relative w-full sm:w-64">
-                  <span className="absolute left-3 top-2.5 text-gray-500">
+                  <span className="absolute left-3 top-2.5 text-gray-400">
                     <Search size={16} />
                   </span>
                   <input
@@ -1193,13 +1251,13 @@ export default function Dashboard() {
                     placeholder="Pesquisar seleção..."
                     value={teamSearch}
                     onChange={(e) => setTeamSearch(e.target.value)}
-                    className="w-full bg-background border border-borderBg border-opacity-40 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-neonBlue font-mono"
+                    className="w-full bg-background border border-borderBg rounded-xl pl-9 pr-4 py-2 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-neonBlue font-mono"
                   />
                 </div>
               </div>
 
-              {/* Lista Grelha Grid de Seleções */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Lista Grelha Grid de Seleções - Cópia Fiel do Design FIFA */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredTeams.map((team) => {
                   const elo = WORLD_CUP_ELO[team] || 1700;
                   const fifaRank = FIFA_RANKINGS[team] || Math.max(15, Math.round(100 - (elo - 1500) * 0.1));
@@ -1209,84 +1267,91 @@ export default function Dashboard() {
                   return (
                     <div 
                       key={team} 
-                      className="glass-card p-5 space-y-4 border border-borderBg border-opacity-25 hover:border-neonBlue transition-all flex flex-col justify-between"
+                      className="bg-cardBg border border-borderBg rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between"
                     >
-                      {/* Cabeçalho do Card */}
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-center gap-3">
-                          <span className="text-4xl">{getFlag(team)}</span>
+                      {/* ZONE 1: Painel Superior com Cor Sólida da Seleção */}
+                      <div className={`p-6 ${getTeamBrandColor(team)} h-36 flex flex-col justify-between`}>
+                        <div className="flex justify-between items-start">
+                          <span className="text-4xl filter drop-shadow">{getFlag(team)}</span>
+                          <span className="text-[9px] uppercase font-mono tracking-widest opacity-80 font-bold">
+                            Mundial 26
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-[9px] uppercase font-mono tracking-wider opacity-85 block">
+                            Seleção Classificada
+                          </span>
+                          <h4 className="font-outfit font-black text-xl leading-none tracking-tight">{team}</h4>
+                        </div>
+                      </div>
+
+                      {/* ZONE 2: Painel Inferior Crisp White com Info e Estatísticas */}
+                      <div className="p-5 bg-cardBg space-y-4">
+                        {/* Badges de Ranking */}
+                        <div className="flex gap-2 items-center">
+                          <span className="text-[9px] bg-neonBlue bg-opacity-10 text-neonBlue border border-neonBlue border-opacity-25 px-2.5 py-0.5 rounded font-mono font-bold">
+                            FIFA #{fifaRank}
+                          </span>
+                          <span className="text-[9px] bg-gold bg-opacity-10 text-gold border border-gold border-opacity-25 px-2.5 py-0.5 rounded font-mono font-bold">
+                            ELO {elo}
+                          </span>
+                        </div>
+
+                        {/* Grelha de Estatísticas Reais */}
+                        <div className="bg-background bg-opacity-60 p-3 rounded-xl border border-borderBg border-opacity-40 grid grid-cols-4 gap-2 text-center font-mono text-[11px] text-gray-600">
                           <div>
-                            <h4 className="font-outfit font-black text-white text-base leading-snug">{team}</h4>
-                            <div className="flex gap-2 items-center mt-1">
-                              <span className="text-[9px] bg-neonBlue bg-opacity-10 text-neonBlue border border-neonBlue border-opacity-20 px-2 py-0.5 rounded font-mono font-semibold">
-                                FIFA #{fifaRank}
-                              </span>
-                              <span className="text-[9px] bg-gold bg-opacity-10 text-gold border border-gold border-opacity-20 px-2 py-0.5 rounded font-mono font-semibold">
-                                ELO {elo}
-                              </span>
-                            </div>
+                            <span className="text-[9px] text-gray-500 block uppercase">Jogos</span>
+                            <span className="font-bold text-gray-900">{stats.played}</span>
+                          </div>
+                          <div>
+                            <span className="text-[9px] text-gray-500 block uppercase">Vitórias</span>
+                            <span className="font-bold text-emerald">{stats.wins}</span>
+                          </div>
+                          <div>
+                            <span className="text-[9px] text-gray-500 block uppercase">Empates</span>
+                            <span className="font-bold text-gold">{stats.draws}</span>
+                          </div>
+                          <div>
+                            <span className="text-[9px] text-gray-500 block uppercase">Derrotas</span>
+                            <span className="font-bold text-red-500">{stats.losses}</span>
+                          </div>
+                          <div className="col-span-2 pt-2 border-t border-borderBg border-opacity-50">
+                            <span className="text-[9px] text-gray-500 block uppercase">Golos (GF:GS)</span>
+                            <span className="font-bold text-gray-900">{stats.gf}:{stats.ga}</span>
+                          </div>
+                          <div className="pt-2 border-t border-borderBg border-opacity-50">
+                            <span className="text-[9px] text-gray-500 block uppercase">DG</span>
+                            <span className={`font-bold ${dg > 0 ? "text-emerald" : dg < 0 ? "text-red-500" : "text-gray-500"}`}>
+                              {dg > 0 ? `+${dg}` : dg}
+                            </span>
+                          </div>
+                          <div className="pt-2 border-t border-borderBg border-opacity-50">
+                            <span className="text-[9px] text-gray-500 block uppercase">Aproveit.</span>
+                            <span className="font-bold text-gold">
+                              {stats.played > 0 ? Math.round(((stats.wins * 3 + stats.draws) / (stats.played * 3)) * 100) : 0}%
+                            </span>
                           </div>
                         </div>
-                        
-                        <span className="text-[10px] text-gray-500 uppercase font-mono">
-                          Mundial 2026
-                        </span>
-                      </div>
 
-                      {/* Grelha de Estatísticas Reais */}
-                      <div className="bg-background bg-opacity-40 p-3 rounded-xl border border-borderBg border-opacity-10 grid grid-cols-4 gap-2 text-center font-mono text-[11px] text-gray-300">
-                        <div>
-                          <span className="text-[9px] text-gray-500 block uppercase">Jogos</span>
-                          <span className="font-bold text-white">{stats.played}</span>
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-gray-500 block uppercase">Vitórias</span>
-                          <span className="font-bold text-emerald">{stats.wins}</span>
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-gray-500 block uppercase">Empates</span>
-                          <span className="font-bold text-gold">{stats.draws}</span>
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-gray-500 block uppercase">Derrotas</span>
-                          <span className="font-bold text-red-400">{stats.losses}</span>
-                        </div>
-                        <div className="col-span-2 pt-2 border-t border-borderBg border-opacity-10">
-                          <span className="text-[9px] text-gray-500 block uppercase">Golos (GF:GS)</span>
-                          <span className="font-bold text-white">{stats.gf}:{stats.ga}</span>
-                        </div>
-                        <div className="pt-2 border-t border-borderBg border-opacity-10">
-                          <span className="text-[9px] text-gray-500 block uppercase">DG</span>
-                          <span className={`font-bold ${dg > 0 ? "text-emerald" : dg < 0 ? "text-red-400" : "text-gray-400"}`}>
-                            {dg > 0 ? `+${dg}` : dg}
-                          </span>
-                        </div>
-                        <div className="pt-2 border-t border-borderBg border-opacity-10">
-                          <span className="text-[9px] text-gray-500 block uppercase">Aproveitamento</span>
-                          <span className="font-bold text-gold">
-                            {stats.played > 0 ? Math.round(((stats.wins * 3 + stats.draws) / (stats.played * 3)) * 100) : 0}%
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Badges de Forma Recente */}
-                      <div className="flex justify-between items-center border-t border-borderBg border-opacity-10 pt-3">
-                        <span className="text-[10px] text-gray-500 font-mono">ÚLTIMOS 5 JOGOS:</span>
-                        <div className="flex gap-1.5">
-                          {stats.form.map((f: string, idx2: number) => (
-                            <span 
-                              key={idx2}
-                              className={`h-5 w-5 rounded-full flex items-center justify-center font-bold text-[9px] font-mono shadow-sm ${
-                                f === "W" 
-                                  ? "bg-emerald text-white" 
-                                  : f === "D" 
-                                    ? "bg-gold text-background" 
-                                    : "bg-red-500 text-white"
-                              }`}
-                            >
-                              {f === "W" ? "V" : f === "D" ? "E" : "D"}
-                            </span>
-                          ))}
+                        {/* Badges de Forma Recente */}
+                        <div className="flex justify-between items-center border-t border-borderBg border-opacity-50 pt-3">
+                          <span className="text-[9px] text-gray-500 font-mono">ÚLTIMOS 5 JOGOS:</span>
+                          <div className="flex gap-1">
+                            {stats.form.map((f: string, idx2: number) => (
+                              <span 
+                                key={idx2}
+                                className={`h-5 w-5 rounded-full flex items-center justify-center font-bold text-[9px] font-mono shadow-sm ${
+                                  f === "W" 
+                                    ? "bg-emerald text-white" 
+                                    : f === "D" 
+                                      ? "bg-gold text-background" 
+                                      : "bg-red-500 text-white"
+                                }`}
+                              >
+                                {f === "W" ? "V" : f === "D" ? "E" : "D"}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>

@@ -8,9 +8,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: "#0B0F19",
-        cardBg: "#161D30",
-        borderBg: "#24324F",
+        background: "#F3F3F3",
+        cardBg: "#FFFFFF",
+        borderBg: "#E4E8F0",
         gold: {
           light: "#FFE57F",
           DEFAULT: "#D4AF37",
@@ -21,7 +21,7 @@ module.exports = {
           DEFAULT: "#10B981",
           dark: "#059669"
         },
-        neonBlue: "#00D2FF"
+        neonBlue: "#304FFE"
       },
       fontFamily: {
         sans: ["var(--font-inter)", "sans-serif"],
