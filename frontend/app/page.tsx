@@ -87,30 +87,42 @@ export default function Dashboard() {
     fetchMartingale();
   }, [banca, odd, lucro]);
 
-  // Função para simular aposta
-  const handleSimulateBet = (match: any, type: string, oddVal: number, stake: number) => {
-    const newBet = {
-      id: Date.now(),
-      match: `${match.home} vs ${match.away}`,
-      type,
-      odd: oddVal,
-      stake,
-      status: "Pendente"
+  // Carregar apostas reais do SQLite
+  useEffect(() => {
+    fetch("http://localhost:8001/api/bets")
+      .then(res => res.json())
+      .then(data => setSimulatedBets(data));
+  }, []);
+
+  // Função para simular aposta (Persistida no SQLite)
+  const handleSimulateBet = async (match: any, type: string, oddVal: number, stake: number) => {
+    const betData = {
+      match_id: match.id,
+      strategy_name: type,
+      stake: stake,
+      odd_taken: oddVal
     };
-    setSimulatedBets([newBet, ...simulatedBets]);
-    setBancaVirtual(prev => Math.round((prev - stake) * 100) / 100);
+    const res = await fetch("http://localhost:8001/api/bets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(betData)
+    });
+    if (res.ok) {
+      const newBet = await res.json();
+      setSimulatedBets([newBet, ...simulatedBets]);
+      setBancaVirtual(prev => Math.round((prev - stake) * 100) / 100);
+    }
   };
 
-  // Simular resultado de uma aposta (Ganhar / Perder) para testes
-  const resolveBet = (id: number, won: boolean, stake: number, oddVal: number) => {
-    setSimulatedBets(prev => prev.map(bet => {
-      if (bet.id === id) {
-        return { ...bet, status: won ? "Ganha" : "Perdida" };
+  // Resolver aposta (Atualizada no SQLite)
+  const resolveBet = async (id: number, won: boolean, stake: number, oddVal: number) => {
+    const status = won ? "Ganha" : "Perdida";
+    const res = await fetch(`http://localhost:8001/api/bets/${id}?status=${status}`, { method: "PUT" });
+    if (res.ok) {
+      setSimulatedBets(prev => prev.map(bet => bet.id === id ? { ...bet, status } : bet));
+      if (won) {
+        setBancaVirtual(prev => Math.round((prev + (stake * oddVal)) * 100) / 100);
       }
-      return bet;
-    }));
-    if (won) {
-      setBancaVirtual(prev => Math.round((prev + (stake * oddVal)) * 100) / 100);
     }
   };
 

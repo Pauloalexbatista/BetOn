@@ -96,6 +96,32 @@ async def get_smart_money():
     engine = SyncEngine()
     return {"alerts": engine.get_smart_money_alerts()}
 
+from database.models import SimulatedBet
+from database.database import SessionLocal
+
+@app.post("/api/bets")
+def create_bet(bet_data: dict):
+    db = SessionLocal()
+    new_bet = SimulatedBet(**bet_data, status="Pendente")
+    db.add(new_bet)
+    db.commit()
+    db.refresh(new_bet)
+    return new_bet
+
+@app.get("/api/bets")
+def get_bets():
+    db = SessionLocal()
+    return db.query(SimulatedBet).all()
+
+@app.put("/api/bets/{bet_id}")
+def update_bet(bet_id: int, status: str):
+    db = SessionLocal()
+    bet = db.query(SimulatedBet).filter(SimulatedBet.id == bet_id).first()
+    if bet:
+        bet.status = status
+        db.commit()
+    return bet
+
 
 @app.get("/api/health")
 def health_check():
