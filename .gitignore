@@ -1,0 +1,37 @@
+# 🐍 Python / Ambientes Virtuais
+.venv/
+venv/
+ENV/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 📦 Node / Next.js (Frontend)
+node_modules/
+.next/
+out/
+build/
+dist/
+.npm
+.eslintcache
+
+# 🔑 Ficheiros de Configuração e Segredos
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# 🗄️ Bases de Dados SQLite Locais
+*.db
+*.sqlite3
+beton.db
+beton_novo.db
+
+# 💻 Ficheiros do Sistema Operativo / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

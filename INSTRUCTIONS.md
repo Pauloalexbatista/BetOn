@@ -12,10 +12,10 @@ Rei Paulo! Concluímos a limpeza completa da fortaleza:
 Quando iniciarmos o novo código, use e forneça estes dados de configuração:
 
 ### 🎫 Chaves de API
-*   **The Odds API Key**: `7fa6a021bc10851d916cdb9f7123304d`
+*   **The Odds API Key**: `[REMOVIDO POR SEGURANÇA - Consultar .env do backend]`
     *   *Função*: Odds de futebol em tempo real e mercados de apostas.
-    *   *Quota*: 500 chamadas gratuitas por dia (ativo e verificado).
-*   **API-Football Key**: `a3986e5d1e1b14e9a235a71e8981eaa4`
+    *   *Quota*: 500 chamadas gratuitas por dia.
+*   **API-Football Key**: `[REMOVIDO POR SEGURANÇA - Consultar .env do backend]`
     *   *Função*: Resultados históricos, classificações, calendários e dados oficiais das ligas.
     *   *Base URL*: `https://v3.football.api-sports.io`
 
@@ -34,6 +34,24 @@ Para evitar qualquer conflito com os outros serviços ativos da VPS, utilize sem
 
 ---
 
+## 🚀 3. Como Iniciar Localmente (Windows Shortcuts)
+
+Criámos dois atalhos automáticos e inteligentes na raiz do projeto para poderes testar e desenvolver no teu PC de forma rápida e autónoma:
+
+1.  **[Iniciar_Backend.bat](file:///c:/Users/paulo/.gemini/antigravity/playground/core-omega/PRJT%20BetOn/Iniciar_Backend.bat)**:
+    *   Verifica se existe um ambiente virtual (`.venv`) e cria-o caso não exista.
+    *   Instala todas as dependências (`pip install -r requirements.txt`) automaticamente.
+    *   Abre automaticamente a documentação interativa da API no teu navegador (`http://localhost:8001/docs`).
+    *   Inicia o servidor FastAPI na porta **`8001`**.
+2.  **[Iniciar_Frontend.bat](file:///c:/Users/paulo/.gemini/antigravity/playground/core-omega/PRJT%20BetOn/Iniciar_Frontend.bat)**:
+    *   Verifica se a pasta `node_modules` existe e corre `npm install` caso esteja em falta.
+    *   Configura as variáveis de ambiente locais necessárias (`frontend/.env.local`).
+    *   Abre automaticamente o Next.js no teu navegador (`http://localhost:3002`).
+    *   Inicia o servidor de desenvolvimento Next.js na porta **`3002`**.
+
+---
+
 > [!TIP]
 > ### 🛡️ Estamos Prontos!
-> Escreva a sua ideia aqui no chat. Vamos desenhar o sistema perfeito e pôr o Alex a trabalhar com total foco no novo plano!
+> Corre os dois ficheiros `.bat` para lançares todo o ecossistema localmente e começares os teus testes e simulações com total facilidade!
+

@@ -14,9 +14,9 @@ services:
       - ENV=development
       - PORT=8000
       - DATABASE_URL=sqlite:///./beton_novo.db
-      - API_FOOTBALL_KEY=a3986e5d1e1b14e9a235a71e8981eaa4
+      - API_FOOTBALL_KEY=$API_FOOTBALL_KEY
       - API_FOOTBALL_BASE_URL=https://v3.football.api-sports.io
-      - THE_ODDS_API_KEY=7fa6a021bc10851d916cdb9f7123304d
+      - THE_ODDS_API_KEY=$THE_ODDS_API_KEY
     restart: always
 
   frontend:
