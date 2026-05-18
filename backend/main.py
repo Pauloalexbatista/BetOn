@@ -5,7 +5,10 @@ import math
 from typing import List, Dict, Optional
 from collectors.api_football_client import APIFootballClient
 from collectors.the_odds_client import TheOddsClient
+from database.database import init_db
 
+# Inicializa a base de dados ao arrancar
+init_db()
 
 app = FastAPI(
     title="🏛️ BetOn Backend API",
