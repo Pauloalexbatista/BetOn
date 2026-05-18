@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: beton-backend-novo
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - ENV=development
+      - PORT=8000
+      - DATABASE_URL=sqlite:///./beton_novo.db
+      - API_FOOTBALL_KEY=a3986e5d1e1b14e9a235a71e8981eaa4
+      - API_FOOTBALL_BASE_URL=https://v3.football.api-sports.io
+      - THE_ODDS_API_KEY=7fa6a021bc10851d916cdb9f7123304d
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: beton-frontend-novo
+    ports:
+      - "3002:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8001
+    depends_on:
+      - backend
+    restart: always
